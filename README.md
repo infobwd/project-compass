@@ -69,6 +69,6 @@ gh auth status
 node tools/private-sync/sync.mjs --collect --owner infobwd --limit 3 --ack-private-local
 ```
 
-The encrypted snapshot is saved only in the user's private application-data area, not in this repo. **Do not commit the snapshot or share the passphrase.** The collector is manual; it does not yet expose private data in the Dashboard and does not run in the scheduled Morning Brief.
+By default the encrypted snapshot is saved in the user's private application-data area, not this repo. On Windows it can instead use a separately protected absolute directory on D: via `BWD_COMPASS_PRIVATE_DIR`; see the [runbook](docs/PC03A_WINDOWS_LOCAL_RUNBOOK.md). Keep it outside every Git worktree. **Do not commit the snapshot or share the passphrase.** The collector is manual; it does not yet expose private data in the Dashboard and does not run in the scheduled Morning Brief.
 
 No merge, no deploy and no production modifications are authorized by this pilot.
