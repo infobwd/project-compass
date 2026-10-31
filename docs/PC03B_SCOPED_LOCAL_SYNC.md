@@ -28,7 +28,7 @@ A count-limited GitHub sync reads the first N sorted accessible owner repositori
 3. Run `npm run test`, `npm run build`, `npm run check:public-dist`.
 4. Run the selected collector manually:
 ```powershell
-$env:BWD_COMPASS_PRIVATE_DIR = 'D:\BWD-Compass-Private\private'
+$env:BWD_COMPASS_PRIVATE_DIR = '<ABSOLUTE_PRIVATE_DIR_OUTSIDE_GIT>'
 node tools/private-sync/sync.mjs --collect --owner sample-owner --selected --ack-private-local
 ```
 5. Verify `selected.snapshot.enc.json` exists; report **counts only**, never the selection JSON, passphrase, or snapshot contents.
