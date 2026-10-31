@@ -36,6 +36,28 @@ test('does not mistake a selected registry for complete global coverage',()=>{
  assert.equal(r.deployment,'NOT_VERIFIED');
  assert.equal(r.acceptance,'NOT_VERIFIED');
 });
+test('fully verified PRs and Issues use nested counts, including nonzero and zero',()=>{
+ const s=fixture();
+ s.projects[1].openPRs={state:'VERIFIED',count:4,atLeast:4};
+ const result=buildEvidenceSummary(s,names,Date.parse('2026-11-01T01:00:00Z'));
+ assert.equal(result.pullRequests.knownOpen,7);
+ assert.equal(result.pullRequests.total,7);
+ assert.equal(result.issues.knownOpen,2);
+ assert.equal(result.issues.total,2);
+ const output=formatEvidenceSummary(result);
+ assert.match(output,/Open PRs: 7 total; 7 from 2 verified repositories/);
+ assert.match(output,/Open Issues: 2 total; 2 from 2 verified repositories/);
+ assert.doesNotMatch(output,/NaN/);
+});
+test('partially unavailable counts are UNKNOWN not NaN or zero',()=>{
+ const r=buildEvidenceSummary(fixture(),names,Date.parse('2026-11-01T01:00:00Z'));
+ assert.equal(r.pullRequests.total,null);
+ assert.equal(r.pullRequests.knownOpen,3);
+ assert.equal(r.pullRequests.unknownProjects,1);
+ const output=formatEvidenceSummary(r);
+ assert.match(output,/Open PRs: UNKNOWN total; 3 from 1 verified repositories; 1 unknown/);
+ assert.doesNotMatch(output,/NaN/);
+});
 test('aggregate report does not expose repository identifiers',()=>{
  const data=buildEvidenceSummary(fixture(),names,Date.parse('2026-11-01T01:00:00Z'));
  const plain=formatEvidenceSummary(data);
