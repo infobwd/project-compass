@@ -5,11 +5,12 @@
 ## Architecture
 - Public Dashboard remains fictional fixtures only. GitHub Pages is public and cannot host an access-controlled private registry.
 - On an authorized Windows user account, GitHub CLI (`gh`) authenticates with GitHub through its own browser flow. The script makes only explicit GitHub API GET requests.
-- In-memory collected repository/branch/open PR/open Issue metadata is encrypted with AES-256-GCM and scrypt using a user-entered passphrase, then saved **outside any Git working tree** in the current user's OS application-data directory.
+- In-memory collected repository/branch/open PR/open Issue metadata is encrypted with AES-256-GCM and scrypt using a user-entered passphrase, then saved **outside any Git working tree** in the current user's OS application-data directory by default, or a separate absolute directory configured via `BWD_COMPASS_PRIVATE_DIR` (for example, a private directory on D:).
 - There is no local HTTP listener, production server, automatic scheduler, private API or frontend integration in PC-03A.
 - The collector does not request a Personal Access Token; GitHub CLI handles authentication. Never commit or paste a token or encryption passphrase.
 - No PR titles or bodies, source code, student names, health data or host URLs are extracted by this pilot.
 - `coverage` is PARTIAL when only some repositories are inspected. API failures are UNKNOWN rather than zero or complete. A commit SHA is Git evidence, not host deployment or acceptance evidence.
+- A configured output directory **must** be an absolute path and is refused if nested inside a Git working tree. The owner must verify D: filesystem permissions and disk encryption; code-level encryption alone does not protect an unlocked session.
 - Encrypted storage protects only at rest. A compromised Windows session can still expose data; use a trusted machine, private account and full-disk encryption where available. Keep the passphrase safe; if lost, re-run the collector.
 - The pilot overwrites its latest encrypted snapshot rather than keeping audit history. Later phases require append-only evidence and freshness detection.
 
