@@ -1,0 +1,121 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/bwd-compass/public-project.schema.json",
+  "title": "Public approved synthetic Project Compass record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "projectId",
+    "title",
+    "summary",
+    "publicationClass",
+    "evidence",
+    "states"
+  ],
+  "properties": {
+    "projectId": {
+      "type": "string",
+      "pattern": "^[a-z0-9-]{2,60}$"
+    },
+    "title": {
+      "type": "string",
+      "maxLength": 100
+    },
+    "summary": {
+      "type": "string",
+      "maxLength": 300
+    },
+    "publicationClass": {
+      "const": "PUBLIC_APPROVED"
+    },
+    "publicRepositoryUrl": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uri"
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "observedAt",
+        "confidence"
+      ],
+      "properties": {
+        "observedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "confidence": {
+          "enum": [
+            "VERIFIED",
+            "REPORTED",
+            "INFERRED",
+            "STALE",
+            "UNKNOWN"
+          ]
+        },
+        "sourceUrl": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "uri"
+        }
+      }
+    },
+    "states": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "development": {
+          "enum": [
+            "PLANNED",
+            "DESIGNING",
+            "IMPLEMENTING",
+            "TESTING",
+            "REVIEW",
+            "ACCEPTED",
+            "UNKNOWN"
+          ]
+        },
+        "git": {
+          "enum": [
+            "LOCAL_ONLY",
+            "PUSHED",
+            "PR_OPEN",
+            "MERGED",
+            "UNKNOWN"
+          ]
+        },
+        "deployment": {
+          "enum": [
+            "NOT_DEPLOYED",
+            "STAGING",
+            "DEPLOYED",
+            "HOST_VERIFIED",
+            "UNKNOWN"
+          ]
+        },
+        "decision": {
+          "enum": [
+            "READY",
+            "BLOCKED",
+            "WAITING_USER",
+            "NEEDS_APPROVAL",
+            "UNKNOWN"
+          ]
+        }
+      }
+    },
+    "nextActions": {
+      "type": "array",
+      "maxItems": 5,
+      "items": {
+        "type": "string",
+        "maxLength": 180
+      }
+    }
+  }
+}
