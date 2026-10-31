@@ -30,7 +30,7 @@ Choose GitHub.com / HTTPS / web browser. Never paste a GitHub token or credentia
 ## Clone if absent, or preserve an existing clone
 ```powershell
 # Example location on D: (replace only if your D: folder layout differs)
-$workRoot = 'D:\BWD-Compass'
+$workRoot = '<LOCAL_WORK_ROOT>'
 $repoPath = Join-Path $workRoot 'project-compass'
 New-Item -ItemType Directory -Force -Path $workRoot | Out-Null
 Test-Path (Join-Path $repoPath '.git')
@@ -72,12 +72,12 @@ Open the local URL Vite prints. Check mobile 390x844, tablet 1024x768 and deskto
 
 ## Private encrypted snapshots on D: (NOT inside the Git checkout)
 Keep encrypted private metadata outside the public source tree. Use a separate directory
-`D:\BWD-Compass-Private\private` for the local snapshot. Never place snapshots under
-`D:\BWD-Compass\project-compass`.
+`<ABSOLUTE_PRIVATE_DIR_OUTSIDE_GIT>` for the local snapshot. Never place snapshots under
+`<LOCAL_PROJECT_WORKTREE>`.
 
 Set this for the **current PowerShell window** before running --check / --collect:
 ```powershell
-$env:BWD_COMPASS_PRIVATE_DIR = 'D:\BWD-Compass-Private\private'
+$env:BWD_COMPASS_PRIVATE_DIR = '<ABSOLUTE_PRIVATE_DIR_OUTSIDE_GIT>'
 node tools/private-sync/sync.mjs --check
 ```
 The reported private output directory must match the D: location. The collector creates the
@@ -86,7 +86,7 @@ This setting affects the current shell only; repeat it in a new window. If the u
 the setting to persist across newly opened PowerShell sessions, choose the Windows user-level
 environment variable explicitly:
 ```powershell
-[Environment]::SetEnvironmentVariable('BWD_COMPASS_PRIVATE_DIR', 'D:\BWD-Compass-Private\private', 'User')
+[Environment]::SetEnvironmentVariable('BWD_COMPASS_PRIVATE_DIR', '<ABSOLUTE_PRIVATE_DIR_OUTSIDE_GIT>', 'User')
 ```
 Close/reopen PowerShell, then verify with `node tools/private-sync/sync.mjs --check`.
 An absolute path is required; paths within any Git worktree are refused. Use a trusted,
