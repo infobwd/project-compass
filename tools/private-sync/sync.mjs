@@ -3,7 +3,7 @@
 import { spawnSync } from 'node:child_process';
 import { randomBytes, scryptSync, createCipheriv, createDecipheriv } from 'node:crypto';
 import { existsSync, mkdirSync, writeFileSync, renameSync, rmSync } from 'node:fs';
-import { join, dirname, resolve } from 'node:path';
+import { join, dirname, resolve, isAbsolute } from 'node:path';
 import { homedir } from 'node:os';
 import { fileURLToPath } from 'node:url';
 
@@ -97,6 +97,13 @@ export async function collectSnapshot(api, {owner, limit=3, now=()=>new Date().t
 }
 
 export function privateDir(env=process.env) {
+  // Optional private location is configured at runtime, never bundled into public assets.
+  const custom=env.BWD_COMPASS_PRIVATE_DIR;
+  if(custom!==undefined) {
+    if(typeof custom!=='string' || !isAbsolute(custom))
+      throw new Error('BWD_COMPASS_PRIVATE_DIR must be an absolute path');
+    return resolve(custom);
+  }
   return process.platform==='win32'
     ? join(env.LOCALAPPDATA||join(homedir(),'AppData','Local'),'BWDProjectCompass','private')
     : join(env.XDG_DATA_HOME||join(homedir(),'.local','share'),'bwd-project-compass','private');
