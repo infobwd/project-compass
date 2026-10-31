@@ -108,3 +108,13 @@ This proposal does **not** implement a server, login, pairing code, private web 
 - D2 (browser authentication and use of encrypted private data) is **NOT AUTHORIZED, NOT IMPLEMENTED**.
 
 Keep all PRs Draft. Do not merge, deploy, enable Pages, copy private snapshot into source, or expose any port on LAN.
+
+
+### PC-03D2 — Synthetic-only local pairing pilot (Draft, no real data)
+D1 locked synthetic shell remains available and unchanged. D2 introduces a **separate** opt-in local pairing pilot with fictional projects, in-memory session cookies, short-lived single-use terminal pairing code, expiry, logout, and explicit synthetic detail acknowledgement. It does NOT unlock private GitHub snapshots, load real project metadata, expose localhost to LAN or publish any web service.
+
+- [D2 Security & Windows acceptance runbook](docs/PC03D2_SYNTHETIC_PAIRING_SECURITY_RUNBOOK.md)
+- To test after checking out the D2 draft branch and passing tests:
+  `node tools/private-ui/auth-synthetic.mjs`
+- Use the URL and one-time code printed on your own local terminal; do not send codes, cookies or screenshots of the terminal code.
+- Existing D0 historical public path metadata review remains OPEN; keep all PRs Draft and do not merge/deploy.
