@@ -101,12 +101,12 @@ detailButton.addEventListener('click',async()=>{
   await api('/session/details','POST',{});
   renderProjects(await api('/api/projects','GET'));
  }catch{
-  status.textContent='ไม่สามารถแสดงรายละเอียดสมมติ กรุณาเข้าสู่ระบบใหม่หาก Session หมดอายุ';
+  reset('ไม่สามารถยืนยันสิทธิ์แสดงรายละเอียด — ล็อกหน้าจอตัวอย่างแล้ว');
  }
 });
 by('logout').addEventListener('click',async()=>{
  try{await api('/session/logout','POST',{});reset('ออกจากระบบแล้ว — LOCKED');}
- catch{reset('เชื่อมต่อเซิร์ฟเวอร์ไม่ได้ — รีเฟรชก่อนเข้าสู่ระบบใหม่');}
+ catch{reset('ไม่ยืนยันการเพิกถอน Session จาก Server — โปรดปิด Server ด้วย Ctrl+C');}
 });
 refresh();
 })();`;
