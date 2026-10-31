@@ -113,3 +113,35 @@ test('cookie never present in unauthenticated HTML, pairing token never in URLs,
   assert.match(pair.headers['cache-control'],/no-store/);
  }finally{await s.close();}
 });
+
+test('paired UI hides code entry and renders synthetic summary as cards, never raw JSON',async()=>{
+ const s=await harness();try{
+  const page=await s.hit('/'),js=await s.hit('/app.js');
+  assert.equal(page.status,200);
+  assert.equal(js.status,200);
+  assert.match(page.text,/id="pair"/);
+  assert.match(page.text,/id="summary"/);
+  assert.match(page.text,/id="private" hidden/);
+  assert.match(page.text,/id="projects"[^>]* hidden/);
+  assert.doesNotMatch(page.text,/<pre\b/i);
+  assert.match(js.text,/pair\.hidden=true/);
+  assert.match(js.text,/pair\.hidden=false/);
+  assert.match(js.text,/renderSummary\(/);
+  assert.match(js.text,/renderProjects\(/);
+  assert.match(js.text,/\.textContent=/);
+  assert.doesNotMatch(js.text,/JSON\.stringify\((?:s|x),null,2\)/);
+  assert.doesNotMatch(page.text,/Fictional Atlas|Sample Orchard/);
+ }finally{await s.close();}
+});
+test('synthetic UI is responsive and does not add external assets or data collectors',async()=>{
+ const s=await harness();try{
+  const page=await s.hit('/'),css=await s.hit('/shell.css'),js=await s.hit('/app.js');
+  assert.match(page.text,/name="viewport"/);
+  assert.match(css.text,/metric-grid/);
+  assert.match(css.text,/@media\(max-width:680px\)/);
+  assert.match(css.text,/\[hidden\]\{display:none!important\}/);
+  assert.doesNotMatch(css.text,/@import|https?:\/\//i);
+  assert.doesNotMatch(page.text,/<iframe|<link[^>]+https?:\/\//i);
+  assert.doesNotMatch(js.text,/localStorage|sessionStorage|document\.cookie|innerHTML|eval\(/);
+ }finally{await s.close();}
+});
