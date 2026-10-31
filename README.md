@@ -75,3 +75,16 @@ No merge, no deploy and no production modifications are authorized by this pilot
 
 ### PC-03B explicit private project scope (Draft PR #4)
 The prior `--limit N` selects the first N alphabetically, not particular projects. PC-03B adds `--selected`, requiring a strictly validated private selection file outside the checkout; see [scoped-sync protocol](docs/PC03B_SCOPED_LOCAL_SYNC.md). The selected encrypted file is written separately from the earlier three-repository pilot. Real project names and private configuration remain on the owner's Windows D: drive only. This is **not** a live authenticated backend and does not verify any host deployment.
+
+
+### PC-03C encrypted private evidence reader (Draft PR #5)
+Read the owner's PC-03B encrypted 11-project snapshot entirely **offline** in a local terminal. Counts, evidence freshness and independently UNKNOWN deployment/acceptance states are displayed without exporting plaintext. Project names appear only on an explicitly acknowledged local detailed command. [PC-03C Windows runbook](docs/PC03C_OFFLINE_PRIVATE_READER.md).
+
+```powershell
+$env:BWD_COMPASS_PRIVATE_DIR = 'D:\BWD-Compass-Private\private'
+node tools/private-sync/read.mjs --summary
+# Optional only on a private local terminal:
+node tools/private-sync/read.mjs --details --ack-private-terminal
+```
+
+PC-03C does not read GitHub live or connect a private backend to the public dashboard; all review, merge and deploy gates remain separate.
