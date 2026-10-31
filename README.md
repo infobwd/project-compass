@@ -2,9 +2,9 @@
 
 **One Dashboard, All Projects, Clear Next Steps**
 
-## Status: PC-01 approved direction · PC-02 synthetic prototype (DRAFT)
+## Status: PC-01 approved direction · PC-02 fictional UI · PC-03A local encrypted collector (DRAFT)
 
-> **Not deployed. No live status sync. No private registry or authentication implemented.**
+> **Not deployed. No live private dashboard/backend is implemented. PC-03A only proposes an opt-in, manually run, encrypted local inventory.**
 
 The owner approved **Public Dashboard + Private Registry** on 2026-11-01, recorded in [ADR-001](docs/PC01_ARCHITECTURE_DECISIONS.md). Approval of the direction is **not** permission to merge or deploy.
 
@@ -42,3 +42,33 @@ Overview · Projects (search, filter, card/list) · Project Detail · Next Actio
 GitHub Pages is public. Private project registry and evidence snapshots must use a separately authenticated, authorized store/API; private data cannot be hidden inside a client bundle, public JSON, JavaScript source map, service worker cache, or static asset. Source repositories remain the source of truth.
 
 No automatic merge, Pages deployment, private-data sync, database migration or production modification.
+
+
+### PC-03A local-only GitHub collector (Draft PR #3)
+
+**Do not run in GitHub Pages or in the browser.** The collector makes GitHub GET requests through the owner's existing GitHub CLI login, then encrypts metadata locally outside the Git checkout. This is a pilot **not** a production private registry API.
+
+1. [Windows step-by-step runbook](docs/PC03A_WINDOWS_LOCAL_RUNBOOK.md)
+2. [Security boundaries and acceptance](docs/PC03A_PRIVATE_SYNC_SECURITY.md)
+
+After clean checkout and successful tests on Windows:
+
+```powershell
+node tools/private-sync/sync.mjs --check
+node --test tests/pc03-private-sync.test.mjs
+npm install
+npm run test
+npm run build
+npm run check:public-dist
+```
+
+Then, only if the owner wishes to perform read-only collection using the local GitHub CLI browser session:
+
+```powershell
+gh auth status
+node tools/private-sync/sync.mjs --collect --owner infobwd --limit 3 --ack-private-local
+```
+
+The encrypted snapshot is saved only in the user's private application-data area, not in this repo. **Do not commit the snapshot or share the passphrase.** The collector is manual; it does not yet expose private data in the Dashboard and does not run in the scheduled Morning Brief.
+
+No merge, no deploy and no production modifications are authorized by this pilot.
