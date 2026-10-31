@@ -15,7 +15,7 @@
 
 ## Windows operator procedure
 1. Keep PC-03D1 running only if needed for inspection; **stop it with Ctrl+C** before testing D2 to avoid confusing browser tabs.
-2. From `D:\BWD-Compass\project-compass`: run `git status --short`, preserve untracked and modified work; `git fetch origin --prune`.
+2. From `<LOCAL_PROJECT_WORKTREE>`: run `git status --short`, preserve untracked and modified work; `git fetch origin --prune`.
 3. If branch is not present locally, run `git switch --track origin/feat/pc03d2-synthetic-local-pairing-20261101`; otherwise safely switch existing branch. Never reset/clean or force checkout.
 4. Confirm exact branch commit: `git rev-parse HEAD`.
 5. Run `npm run test`, `npm run build`, `npm run check:public-dist`. Tests must pass before running the app.
