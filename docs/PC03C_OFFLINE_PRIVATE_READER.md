@@ -23,7 +23,7 @@ Prerequisites: PC-03B test/build/public scan PASS on an owner Windows checkout, 
 
 1. Check worktree changes (existing untracked package-lock/tsbuildinfo should not be deleted):
 ```powershell
-Set-Location 'D:\BWD-Compass\project-compass'
+Set-Location '<LOCAL_PROJECT_WORKTREE>'
 git status --short
 git fetch origin --prune
 ```
@@ -35,7 +35,7 @@ git rev-parse HEAD
 If branch exists, use `git switch feat/pc03c-offline-private-reader-evidence-20261101` without force.
 3. Run exact-head tests/build/scan:
 ```powershell
-$env:BWD_COMPASS_PRIVATE_DIR = 'D:\BWD-Compass-Private\private'
+$env:BWD_COMPASS_PRIVATE_DIR = '<ABSOLUTE_PRIVATE_DIR_OUTSIDE_GIT>'
 npm run test
 npm run build
 npm run check:public-dist
@@ -52,7 +52,7 @@ node tools/private-sync/read.mjs --details --ack-private-terminal
 Do **not** paste details, screenshots with repo names, the selection file, snapshot, or passphrase in a public chat or issue. If details are needed for further work, prefer returning counts and redacted lines.
 6. To verify no new plaintext file was created, review only filenames, not contents:
 ```powershell
-Get-ChildItem 'D:\BWD-Compass-Private\private' -File | Select-Object Name,Length,LastWriteTime
+Get-ChildItem '<ABSOLUTE_PRIVATE_DIR_OUTSIDE_GIT>' -File | Select-Object Name,Length,LastWriteTime
 git status --short
 ```
 Existing `latest.snapshot.enc.json` and `selected.snapshot.enc.json` are **read-only** for PC-03C; no export or overwrite occurs.
