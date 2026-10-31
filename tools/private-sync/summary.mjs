@@ -62,16 +62,18 @@ export function buildEvidenceSummary(snapshot, requestedNames, now=Date.now()){
   const headVerified=projects.filter(p=>p.defaultHead.state==='VERIFIED').length;
   const prVerified=projects.filter(p=>p.openPRs.state==='VERIFIED');
   const issueVerified=projects.filter(p=>p.openIssues.state==='VERIFIED');
-  const sum=items=>items.reduce((t,p)=>t+p.count,0);
+  // Counts live under each repository's openPRs/openIssues object, not on the repository itself.
+  // Only VERIFIED collections are included; an unknown collection makes the global total UNKNOWN.
+  const sum=(items,kind)=>items.reduce((total,repo)=>total+repo[kind].count,0);
   return {count:projects.length,selected:requestedNames.length,
     observedAt:snapshot.observedAt,freshness,
     gitHead:{verified:headVerified,unknown:projects.length-headVerified},
     pullRequests:{verifiedProjects:prVerified.length,
       unknownProjects:projects.length-prVerified.length,
-      knownOpen:sum(prVerified),total:prVerified.length===projects.length?sum(prVerified):null},
+      knownOpen:sum(prVerified,'openPRs'),total:prVerified.length===projects.length?sum(prVerified,'openPRs'):null},
     issues:{verifiedProjects:issueVerified.length,
       unknownProjects:projects.length-issueVerified.length,
-      knownOpen:sum(issueVerified),total:issueVerified.length===projects.length?sum(issueVerified):null},
+      knownOpen:sum(issueVerified,'openIssues'),total:issueVerified.length===projects.length?sum(issueVerified,'openIssues'):null},
     deployment:CURRENT,acceptance:CURRENT,
     projects:projects.map(p=>({name:p.fullName,defaultBranch:p.defaultBranch,
       gitHead:p.defaultHead.state,openPRs:p.openPRs.state==='VERIFIED'?p.openPRs.count:null,
