@@ -2,8 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { mkdtempSync, mkdirSync, rmSync, existsSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
-import { encryptSnapshot, decryptSnapshot, getAllPages, collectSnapshot, assertOutsideGit, saveEncrypted } from '../tools/private-sync/sync.mjs';
+import { join, resolve } from 'node:path';
+import { encryptSnapshot, decryptSnapshot, getAllPages, collectSnapshot, assertOutsideGit, saveEncrypted, privateDir } from '../tools/private-sync/sync.mjs';
 
 const sha='a'.repeat(40),owner='example-owner',full=owner+'/example-app';
 const repo={id:4,full_name:full,owner:{login:owner},private:true,default_branch:'main'};
@@ -41,6 +41,12 @@ test('invalid passphrase and ciphertext are rejected',()=>{
   const x=encryptSnapshot({ok:true},'example-long-passphrase');
   x.tag=Buffer.alloc(16).toString('base64');
   assert.throws(()=>decryptSnapshot(x,'example-long-passphrase'));
+});
+test('absolute custom private directory can live on another drive; relative path denied',()=>{
+  const requested=join(tmpdir(),'bwd-compass-private-fixture');
+  assert.equal(privateDir({BWD_COMPASS_PRIVATE_DIR:requested}),resolve(requested));
+  assert.throws(()=>privateDir({BWD_COMPASS_PRIVATE_DIR:'private'}),/absolute path/);
+  assert.throws(()=>privateDir({BWD_COMPASS_PRIVATE_DIR:''}),/absolute path/);
 });
 test('Git worktree output is blocked',()=>{
   const tmp=mkdtempSync(join(tmpdir(),'compass-git-'));
