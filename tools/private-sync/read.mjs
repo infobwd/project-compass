@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // PC-03C: Local-only private snapshot reader. No network, HTTP listener, file exports, or Git writes.
 import { existsSync, statSync, readFileSync } from 'node:fs';
-import { join } from 'node:path';
+import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { privateDir, assertOutsideGit, decryptSnapshot } from './sync.mjs';
 import { parseSelection } from './selection.mjs';
@@ -63,5 +63,5 @@ async function main(){
   if(snapshot.owner!==selectedConfig.owner)throw new Error('Snapshot owner mismatch');
   console.log(formatEvidenceSummary(evidence,{details}));
 }
-const isMain=process.argv[1]&&fileURLToPath(import.meta.url)===process.argv[1].replace(/\\/g,'/');
+const isMain=process.argv[1]&&resolve(process.argv[1])===fileURLToPath(import.meta.url);
 if(isMain)main().catch(err=>{console.error('PC-03C stopped safely: '+err.message);process.exitCode=1;});
