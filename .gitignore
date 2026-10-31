@@ -11,3 +11,7 @@ private/
 coverage/
 playwright-report/
 test-results/
+
+# Private PC-03B repo scope must stay outside public repository
+projects.selection.json
+selected.snapshot.enc.json

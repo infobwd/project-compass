@@ -2,7 +2,8 @@
 // PC-03A: read-only GitHub metadata collector. Never imported by the public frontend.
 import { spawnSync } from 'node:child_process';
 import { randomBytes, scryptSync, createCipheriv, createDecipheriv } from 'node:crypto';
-import { existsSync, mkdirSync, writeFileSync, renameSync, rmSync } from 'node:fs';
+import { existsSync, mkdirSync, writeFileSync, renameSync, rmSync, readFileSync } from 'node:fs';
+import { parseSelection, selectOwnerRepositories } from './selection.mjs';
 import { join, dirname, resolve, isAbsolute } from 'node:path';
 import { homedir } from 'node:os';
 import { fileURLToPath } from 'node:url';
@@ -54,7 +55,7 @@ export async function getAllPages(api, uri, maxPages = 10) {
   return { items: all, complete: false };
 }
 
-export async function collectSnapshot(api, {owner, limit=3, now=()=>new Date().toISOString()}) {
+export async function collectSnapshot(api, {owner, limit=3, selectedRepositories=null, now=()=>new Date().toISOString()}) {
   if (!LOGIN.test(owner||'')) throw new Error('Invalid account name');
   if (!Number.isInteger(limit) || limit<1 || limit>100) throw new Error('Limit must be 1..100');
   const listing = await getAllPages(api, '/user/repos?affiliation=owner,collaborator,organization_member');
@@ -62,8 +63,10 @@ export async function collectSnapshot(api, {owner, limit=3, now=()=>new Date().t
   const eligible = listing.items.filter(r=>r?.owner?.login?.toLowerCase()===owner.toLowerCase() && FULL_NAME.test(r.full_name||''));
   const unique = [...new Map(eligible.map(r=>[r.id,r])).values()]
     .sort((a,b)=>a.full_name.localeCompare(b.full_name));
+  const isSelected=selectedRepositories!==null;
+  const chosen=isSelected?selectOwnerRepositories(unique,selectedRepositories):unique.slice(0,limit);
   const projects=[];
-  for(const repo of unique.slice(0,limit)) {
+  for(const repo of chosen) {
     const full=repo.full_name, branch=repo.default_branch;
     if(!/^[a-z0-9_.\/-]+$/i.test(branch||'')) throw new Error('Invalid default branch metadata');
     let sha=null, shaState='UNKNOWN';
@@ -90,7 +93,9 @@ export async function collectSnapshot(api, {owner, limit=3, now=()=>new Date().t
     });
   }
   return {format:'BWD-COMPASS-REGISTRY-V1',observedAt:now(),owner,
-    coverage:limit>=unique.length?'ALL_ACCESSIBLE_FOR_OWNER':'PARTIAL',
+    coverage:isSelected?'ALL_SELECTED':(limit>=unique.length?'ALL_ACCESSIBLE_FOR_OWNER':'PARTIAL'),
+    selection:isSelected?{mode:'EXPLICIT',requested:selectedRepositories.length,matched:chosen.length}:
+      {mode:'FIRST_N_BY_NAME',limit},
     discoveredOwnerRepositories:unique.length,inspectedRepositories:projects.length,projects,
     source:'GitHub CLI read-only authenticated API',
     caveat:'No host, CI, local-worktree, acceptance or deployment claim. PRIVATE ONLY.'};
@@ -115,14 +120,24 @@ export function assertOutsideGit(path) {
     const up=dirname(dir);if(up===dir)break;dir=up;
   }
 }
-export function saveEncrypted(envelope, folder=privateDir()) {
+export function saveEncrypted(envelope, folder=privateDir(), fileName='latest.snapshot.enc.json') {
+  if(!['latest.snapshot.enc.json','selected.snapshot.enc.json'].includes(fileName))
+    throw new Error('Unsupported private snapshot filename');
   assertOutsideGit(folder);mkdirSync(folder,{recursive:true,mode:0o700});assertOutsideGit(folder);
-  const filename=join(folder,'latest.snapshot.enc.json'),temp=join(folder,'.snapshot-'+process.pid+'.tmp');
+  const filename=join(folder,fileName),temp=join(folder,'.snapshot-'+process.pid+'.tmp');
   try {
     writeFileSync(temp,JSON.stringify(envelope)+'\n',{encoding:'utf8',mode:0o600,flag:'wx'});
     renameSync(temp,filename);
   } finally {if(existsSync(temp))rmSync(temp,{force:true});}
   return filename;
+}
+function loadPrivateSelection(owner) {
+  const folder=privateDir();
+  assertOutsideGit(folder);
+  const filename=join(folder,'projects.selection.json');
+  assertOutsideGit(filename);
+  // The selection file is private configuration and must NEVER enter the public bundle.
+  return parseSelection(readFileSync(filename,'utf8'),owner);
 }
 function gh(path) {
   const r=spawnSync('gh',['api','-X','GET',path],{encoding:'utf8',windowsHide:true,maxBuffer:16*1024*1024,timeout:25000});
@@ -151,7 +166,7 @@ function hiddenInput(message) {
 async function main() {
   const args=process.argv.slice(2);
   if(args.length===0 || args.includes('--help')) {
-    console.log('Usage: node tools/private-sync/sync.mjs --check OR --collect --owner ACCOUNT --limit 3 --ack-private-local');
+    console.log('Usage: --check OR --collect --owner ACCOUNT [--limit N OR --selected] --ack-private-local');
     return;
   }
   if(args.length===1 && args[0]==='--check') {
@@ -159,19 +174,23 @@ async function main() {
     console.log('Node '+process.version+'; GitHub CLI '+(r.status===0?'installed':'NOT INSTALLED'));
     console.log('Private output directory: '+privateDir());return;
   }
-  const allowed=new Set(['--collect','--owner','--limit','--ack-private-local']);
+  const allowed=new Set(['--collect','--owner','--limit','--selected','--ack-private-local']);
   if(args.some(a=>a.startsWith('--')&&!allowed.has(a)))throw new Error('Unknown argument');
   if(!args.includes('--collect')||!args.includes('--ack-private-local'))throw new Error('Explicit local opt-in required');
   const val=flag=>{const i=args.indexOf(flag);return i<0?undefined:args[i+1];};
   const owner=val('--owner'),limit=Number(val('--limit')||3);
+  const isSelected=args.includes('--selected');
+  if(isSelected && args.includes('--limit'))throw new Error('Use --selected OR --limit, not both');
   if(!LOGIN.test(owner||'')||!Number.isInteger(limit)||limit<1||limit>100)
     throw new Error('Provide --owner ACCOUNT and --limit 1..100');
+  const selectedRepositories=isSelected?loadPrivateSelection(owner):null;
   const auth=spawnSync('gh',['auth','status'],{encoding:'utf8',windowsHide:true,timeout:15000});
   if(auth.status!==0)throw new Error('GitHub CLI is not authenticated; run gh auth login');
   console.log('Reading GitHub metadata into memory (no public upload)...');
-  const record=await collectSnapshot(gh,{owner,limit});
+  const record=await collectSnapshot(gh,{owner,limit,selectedRepositories});
   const passphrase=await hiddenInput('Encryption passphrase (12+ characters; not echoed): ');
-  const path=saveEncrypted(encryptSnapshot(record,passphrase));
+  const path=saveEncrypted(encryptSnapshot(record,passphrase),privateDir(),
+    isSelected?'selected.snapshot.enc.json':'latest.snapshot.enc.json');
   console.log('Encrypted snapshot saved to '+path);
   console.log('Inspected '+record.inspectedRepositories+' repositories; '+record.coverage+'. No host or deployment state verified.');
 }
