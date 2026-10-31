@@ -29,7 +29,8 @@ Choose GitHub.com / HTTPS / web browser. Never paste a GitHub token or credentia
 
 ## Clone if absent, or preserve an existing clone
 ```powershell
-$workRoot = Join-Path $HOME 'source'
+# Example location on D: (replace only if your D: folder layout differs)
+$workRoot = 'D:\BWD-Compass'
 $repoPath = Join-Path $workRoot 'project-compass'
 New-Item -ItemType Directory -Force -Path $workRoot | Out-Null
 Test-Path (Join-Path $repoPath '.git')
@@ -69,6 +70,28 @@ npm run dev
 ```
 Open the local URL Vite prints. Check mobile 390x844, tablet 1024x768 and desktop; search, filters, details, daily brief demo, dark mode, keyboard and browser zoom. Stop Vite with Ctrl+C. Do not call the local URL a deployed Pages site.
 
+## Private encrypted snapshots on D: (NOT inside the Git checkout)
+Keep encrypted private metadata outside the public source tree. Use a separate directory
+`D:\BWD-Compass-Private\private` for the local snapshot. Never place snapshots under
+`D:\BWD-Compass\project-compass`.
+
+Set this for the **current PowerShell window** before running --check / --collect:
+```powershell
+$env:BWD_COMPASS_PRIVATE_DIR = 'D:\BWD-Compass-Private\private'
+node tools/private-sync/sync.mjs --check
+```
+The reported private output directory must match the D: location. The collector creates the
+directory on its first successful encrypted collection. Avoid printing/sharing its contents.
+This setting affects the current shell only; repeat it in a new window. If the user wants
+the setting to persist across newly opened PowerShell sessions, choose the Windows user-level
+environment variable explicitly:
+```powershell
+[Environment]::SetEnvironmentVariable('BWD_COMPASS_PRIVATE_DIR', 'D:\BWD-Compass-Private\private', 'User')
+```
+Close/reopen PowerShell, then verify with `node tools/private-sync/sync.mjs --check`.
+An absolute path is required; paths within any Git worktree are refused. Use a trusted,
+access-controlled account and device encryption for D: as well.
+
 ## Read-only private collection (separate from demo)
 ```powershell
 node tools/private-sync/sync.mjs --check
@@ -76,11 +99,12 @@ gh auth status
 node tools/private-sync/sync.mjs --collect --owner infobwd --limit 3 --ack-private-local
 ```
 Enter a separate passphrase (12+ characters) when prompted; input is hidden. The first three inspected owner repositories form a **partial** snapshot when more than three exist.
-The script stores only `latest.snapshot.enc.json` under the user's OS application data; on Windows:
+The script stores only `latest.snapshot.enc.json` in the directory reported by `--check`. With the D: override above:
 ```powershell
-$privateDir = Join-Path $env:LOCALAPPDATA 'BWDProjectCompass\private'
+$privateDir = $env:BWD_COMPASS_PRIVATE_DIR
 Get-ChildItem "$privateDir" -File | Select-Object Name, Length, LastWriteTime
 ```
+Without this override, it uses the OS application-data default (usually C:).
 Never copy this file into the Git clone or public Pages. Only after reviewing the first run, optionally increase `--limit 100` to inspect more accessible owner repositories; this replaces the latest encrypted snapshot.
 
 ## What to report back safely
