@@ -18,6 +18,9 @@ const api=async uri=>{
 test('strict selection parses 2 repository names in requested order',()=>{
  assert.deepEqual(parseSelection(json([second.full_name,first.full_name]),owner),[second.full_name,first.full_name]);
 });
+test('PowerShell UTF-8 BOM selection is accepted',()=>{
+ assert.deepEqual(parseSelection('\uFEFF'+json([first.full_name]),owner),[first.full_name]);
+});
 test('selection rejects duplicate entries, incorrect owner and extra fields',()=>{
  assert.throws(()=>parseSelection(json([first.full_name,first.full_name.toUpperCase()]),owner));
  assert.throws(()=>parseSelection(json(['different-owner/anything']),owner));
