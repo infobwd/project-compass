@@ -88,3 +88,13 @@ node tools/private-sync/read.mjs --details --ack-private-terminal
 ```
 
 PC-03C does not read GitHub live or connect a private backend to the public dashboard; all review, merge and deploy gates remain separate.
+
+
+### PC-03D owner-local private dashboard — security design only (proposed)
+The owner reported PC-03C local Node tests, build, public scanner, and 11/11 encrypted summary PASS. These are **owner-reported Local Acceptance**, not independent CI or Production Acceptance.
+
+Before starting an actual private-data browser UI, review:
+- [PC-03D architecture and local browser threat model](docs/PC03D_LOCAL_PRIVATE_DASHBOARD_ARCHITECTURE.md)
+- [PC-03D implementation phases, security tests and acceptance](docs/PC03D_IMPLEMENTATION_TEST_MATRIX.md)
+
+This proposal does **not** implement a server, login, pairing code, private web API or authenticated page; nothing is deployed or merged. Prior public draft documentation containing concrete Windows path examples also needs privacy review before merge. The existing offline CLI remains the safe fallback.
