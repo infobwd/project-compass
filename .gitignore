@@ -1,0 +1,13 @@
+node_modules/
+dist/
+.vite/
+.env
+.env.*
+!.env.example
+*.enc.json
+*.snapshot.json
+private/
+.compass-private/
+coverage/
+playwright-report/
+test-results/
