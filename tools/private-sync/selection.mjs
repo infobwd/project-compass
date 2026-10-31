@@ -6,7 +6,7 @@ export function parseSelection(text, owner) {
   if (!LOGIN.test(owner||'')) throw new Error('Invalid account name');
   if(typeof text!=='string' || text.length>32768)throw new Error('Invalid or oversized selection file');
   let raw;
-  try {raw=JSON.parse(text);}catch{throw new Error('Selection file must be valid JSON');}
+  try {raw=JSON.parse(text.replace(/^\uFEFF/,''));}catch{throw new Error('Selection file must be valid JSON');}
   if(!raw || Array.isArray(raw) || typeof raw!=='object' ||
      raw.format!==FORMAT || raw.owner!==owner || !Array.isArray(raw.repositories))
     throw new Error('Selection format, owner or repository list mismatch');
