@@ -98,3 +98,13 @@ Before starting an actual private-data browser UI, review:
 - [PC-03D implementation phases, security tests and acceptance](docs/PC03D_IMPLEMENTATION_TEST_MATRIX.md)
 
 This proposal does **not** implement a server, login, pairing code, private web API or authenticated page; nothing is deployed or merged. Prior public draft documentation containing concrete Windows path examples also needs privacy review before merge. The existing offline CLI remains the safe fallback.
+
+
+### PC-03D0/D1 — synthetic owner-local locked shell (DRAFT, no private data)
+- [D0 privacy audit and D1 Windows acceptance runbook](docs/PC03D0_D1_AUDIT_AND_WINDOWS_RUNBOOK.md)
+- `node tools/private-ui/locked-demo.mjs`: starts an **explicitly synthetic** locked page on IPv4 127.0.0.1 with a random local port. There is no real login, pairing or private data route. No snapshot is read.
+- `node --test tests/pc03d1-locked-shell.test.mjs` plus `npm run test`, `npm run build`, `npm run check:public-dist` must pass on the exact new branch before Local Acceptance.
+- The latest draft documents replace concrete Windows paths with placeholders. **Older public Git commit history still contains the prior examples**; historical exposure review is open and must not be treated as resolved by this change alone.
+- D2 (browser authentication and use of encrypted private data) is **NOT AUTHORIZED, NOT IMPLEMENTED**.
+
+Keep all PRs Draft. Do not merge, deploy, enable Pages, copy private snapshot into source, or expose any port on LAN.
