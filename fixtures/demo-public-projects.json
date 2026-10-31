@@ -1,0 +1,42 @@
+[
+  {
+    "projectId": "sample-a",
+    "title": "Sample Document Library",
+    "summary": "Fictitious project data for UI layout only.",
+    "publicationClass": "PUBLIC_APPROVED",
+    "evidence": {
+      "observedAt": "2026-11-01T00:00:00+07:00",
+      "confidence": "UNKNOWN",
+      "sourceUrl": null
+    },
+    "states": {
+      "development": "DESIGNING",
+      "git": "UNKNOWN",
+      "deployment": "UNKNOWN",
+      "decision": "READY"
+    },
+    "nextActions": [
+      "Review example wireframe"
+    ]
+  },
+  {
+    "projectId": "sample-b",
+    "title": "Sample Reporting App",
+    "summary": "No live repository or deployment information.",
+    "publicationClass": "PUBLIC_APPROVED",
+    "evidence": {
+      "observedAt": "2026-11-01T00:00:00+07:00",
+      "confidence": "UNKNOWN",
+      "sourceUrl": null
+    },
+    "states": {
+      "development": "PLANNED",
+      "git": "UNKNOWN",
+      "deployment": "UNKNOWN",
+      "decision": "NEEDS_APPROVAL"
+    },
+    "nextActions": [
+      "Approve fictitious example design"
+    ]
+  }
+]
