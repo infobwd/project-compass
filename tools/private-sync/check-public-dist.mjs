@@ -10,9 +10,9 @@ const forbidden=[
   /-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----/,
   /PRIVATE_PROJECT_REGISTRY\.json/i,
   /latest\.snapshot\.enc\.json/i,
-  /[A-Z]:\\(?:Users|CODEX|wd-standard|wd-books-manual)/i,
-  /(?:tdrs|plc|wd)\.esdc\.app/i,
-  /\/repos\/infobwd\/(?:tdrs|wd-standard|plc|my-health-os|nopparut-pa)/i,
+  /[A-Z]:\\[A-Za-z0-9_.-]+\\/i,
+  /[a-z0-9.-]+\.esdc\.app/i,
+  /(?:api\.github\.com\/repos\/|github\.com\/)[a-z0-9_.-]+\/[a-z0-9_.-]+/i,
 ];
 function scan(dir) {
   let count=0;
