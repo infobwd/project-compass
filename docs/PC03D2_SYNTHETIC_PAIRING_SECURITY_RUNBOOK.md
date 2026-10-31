@@ -54,3 +54,18 @@
 - D1 Local Acceptance: PASS from owner report and loopback screenshot; no independently audited production host.
 - D2 implementation: local Node.js v22 synthetic test run on developer container is **10/10 PASS** for the standalone module; exact GitHub PR SHA and Windows device acceptance remain **NOT VERIFIED** until user runs them.
 - No Merge / No Deploy.
+
+
+## PC-03D2 UX refinement after owner browser screenshot
+An owner-supplied browser screenshot confirmed `PAIRED — synthetic data only` and both simulated summary/details appeared. It **did not independently confirm** logout revocation, timeout, invalid-code handling, Host/Origin hardening, or Node/Build/Dist acceptance on the current revision.
+
+The initial layout left the pairing field visible even when paired and exposed simulated data as raw JSON blocks. The D2 Draft PR now:
+- Hides the pairing form during an authenticated synthetic session, restores it on lock/logout.
+- Shows a readable **responsive evidence card grid** for simulated project counts and states.
+- Displays fictional detail projects as accessible list items only after a separate confirmation.
+- Clears visible synthetic details when a details API request fails; reports uncertainty instead of claiming server logout succeeded after network failure.
+- Preserves labels `LOCAL · SYNTHETIC · D2 PILOT`, `NOT_VERIFIED` and read-only dummy data boundaries.
+
+**Retest needed on the updated PR HEAD:** `npm run test`, `npm run build`, `npm run check:public-dist`, then start `node tools/private-ui/auth-synthetic.mjs` and re-enter the **new** one-time code from the terminal. Check 390×844, 1024×768, 1440×900, keyboard input, pairing form hidden after success, summary cards, detail step-up, logout form restored, and Ctrl+C loopback shutdown. Never copy the one-time code or session cookie into a screenshot.
+
+The existing D0 old-Git-history Windows-path review remains open. No real private registry data can be accessed or linked from D2.
