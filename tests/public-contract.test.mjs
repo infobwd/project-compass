@@ -1,0 +1,10 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+const r=(p)=>readFileSync(new URL('../'+p,import.meta.url),'utf8');
+test('static demo labels present',()=>{assert.match(r('src/App.tsx'),/DEMO MODE/);assert.match(r('src/demo.ts'),/Synthetic sample portfolio/);});
+test('private data not fetched by public UI',()=>{assert.doesNotMatch(r('src/App.tsx')+r('src/demo.ts'),/fetch\s*\(|axios\s*\(|WebSocket\s*\(/);});
+test('separate git, development, deploy, decision, confidence axes',()=>{for(const key of ['development','git','deployment','decision','confidence'])assert.ok(r('src/demo.ts').includes(key));});
+test('public build has no release script or source map',()=>{const p=JSON.parse(r('package.json'));assert.equal(p.scripts.deploy,undefined);assert.match(r('vite.config.ts'),/sourcemap:false/);});
+test('mobile bottom-nav accounts for safe area',()=>{assert.match(r('src/App.tsx'),/aria-label="นำทางมือถือ"/);assert.match(r('src/styles.css'),/safe-area-inset-bottom/);});
+test('no private data fixture or real evidence URL',()=>{assert.doesNotMatch(r('src/demo.ts'),/https?:\/\//);assert.doesNotMatch(r('src/demo.ts'),/[A-Z]:\\/);assert.match(r('src/App.tsx'),/ไม่มีลิงก์หลักฐานจริง/);});
