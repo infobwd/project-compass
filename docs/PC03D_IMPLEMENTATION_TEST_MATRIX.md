@@ -1,6 +1,6 @@
 # PC-03D — Implementation Breakdown, Acceptance & Operator Runbook (PLAN ONLY)
 
-**Current phase:** design/security review. No PC-03D server code is implemented and no acceptance checks below have run.
+**Current phase:** D0/D1 synthetic locked server implemented in Draft PR #7; Local Acceptance PASS by owner report and partial screenshot/socket corroboration on 2026-11-01. D2 authentication and real private-data browser access NOT STARTED / NOT AUTHORIZED. See [PC-03D1 Local Acceptance](PC03D1_LOCAL_ACCEPTANCE_OWNER_REPORTED_20261101.md).
 
 ## Baseline and evidence inventory
 | Gate | Latest grounded status | What it DOES NOT prove |
@@ -9,7 +9,7 @@
 | PC-03C Node Tests after NaN fix | OWNER_REPORTED PASS (no attached CI logs) | Independently verified CI or a secure web UI |
 | PC-03C Build + public-dist scan | OWNER_REPORTED PASS | Comprehensive privacy or penetration assessment |
 | PC-03C 11/11 private summary without NaN | OWNER_REPORTED PASS | Live sync or host acceptance |
-| PC-03D | NOT_STARTED (documentation proposal only) | Any private browser access authorization |
+| PC-03D D0/D1 | Local locked demo OWNER_REPORTED PASS; visual + loopback screenshot evidence; historic exposure review OPEN | Independent security certification, browser authentication or real private data UI |
 
 Preserve PC-03C Git head SHA when testing; do not reinterpret an older snapshot as live. Every UI claim must carry a source type and observation time.
 
