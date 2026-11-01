@@ -39,7 +39,7 @@ Before importing an encrypted selected Snapshot to an HTTP-serving process, do a
 ## Windows D3A acceptance
 From the operator's existing local project worktree:
 ```powershell
-Set-Location 'D:\BWD-Compass\project-compass'
+Set-Location '<LOCAL_PROJECT_WORKTREE>'
 git status --short
 git fetch origin --prune
 git switch --track origin/feat/pc03d3a-synthetic-evidence-axes-20261101
