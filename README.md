@@ -248,3 +248,12 @@ Following owner-reported PC-04H PASS, use **exact activated encrypted current Sn
 - `node tools/private-ui/private-delta-local.mjs --ack-private-workplan-local --delta-stage-id ID`: new **explicitly opt-in** paired 127.0.0.1 browser view, with Thai delta aggregate section and per-project details **only after separate step-up authorization**. Existing private viewer without opt-in returns HTTP 404 for the new endpoints.
 - Compare refuses absent/changed encrypted old backup, nonmatching current active Stage, changed selected configuration, wrong passphrase, incomplete/duplicate PR/Issue enumerations, or owner workplan scope mismatch. It does **not** refresh Snapshot, mark work complete, create TODO or write host/GitHub data.
 - 16 synthetic-only regression tests added; Windows full tests/build/public scan/manual browser acceptance **PENDING**. Public `src/` and Pages unchanged; no Merge/Deploy or real private data in public Git.
+
+
+### PC-04J — Owner-private review of saved OPEN-list changes (Draft)
+Following **owner-reported PC-04I Local PASS**, the paired/step-up-only private Snapshot Delta page can show **all changed PR/Issue numbers**, rather than only the 12-number short preview, in bounded 10-item pages. Each number opens the existing **unsaved PC-04F evidence worksheet** for manual review. [PC-04J local Windows runbook](docs/PC04J_PRIVATE_DELTA_REVIEW_QUEUE_RUNBOOK.md).
+
+- Four strictly descriptive categories per selected project: PR/Issue **NEW_OPEN** and **NO_LONGER_OPEN** *between two saved snapshots*. Neither category proves a PR was merged, an issue closed, work completed, or a host deployed. No automatic priority/TODO.
+- `GET /api/delta/review/{index}/{PR|ISSUE}/{NEW_OPEN|NO_LONGER_OPEN}/{page}` is private `127.0.0.1` read-only, **401 before pairing**, **403 before explicit detail authorization**. Bad/out-of-range/POST routes **404**. Logout invalidates access. Model independently validates selected owner workplan and change lists before returning at most 10 saved numbers.
+- Checklist checkboxes are **DOM-only**, not owner-confirmed changes, and have no POST, encrypted workplan save, clipboard export, GitHub query, or public UI linkage. To create a real task, owner independently rechecks GitHub and uses separate encrypted terminal `action-entry.mjs --add-action` with explicit `CONFIRM`.
+- **12 synthetic-only new tests**; actual Windows full regression, Build/Public Dist, browser 401/403/Logout and mobile visual acceptance **PENDING**. Public Pages stays fictional DEMO. No Merge/Deploy or real private data in Git.
