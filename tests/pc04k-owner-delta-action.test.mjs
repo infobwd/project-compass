@@ -145,7 +145,13 @@ test('PC04K public App and private browser never import owner-reviewed write flo
  const server=readFileSync(fileURLToPath(new URL('../tools/private-ui/private-local.mjs',import.meta.url)),'utf8');
  const cli=readFileSync(fileURLToPath(new URL('../tools/private-plan/delta-action-cli.mjs',import.meta.url)),'utf8');
  assert.doesNotMatch(pub,/delta-action-cli|delta-action-handoff|PC04K/);
- assert.doesNotMatch(server,/delta-action-cli|delta-action-handoff|commitOwnerRevision\s*\(/);
+ // UI may DISPLAY a terminal command, but must not import or execute its writer.
+ const privateServerImports=server.split('\n').filter(line=>/^\s*import\s/.test(line)).join('\n');
+ assert.doesNotMatch(privateServerImports,/delta-action-cli|delta-action-handoff/);
+ assert.doesNotMatch(server,/\bimport\s*\(\s*['"][^'"]*(?:delta-action-cli|delta-action-handoff)\.mjs/);
+ assert.doesNotMatch(server,/commitOwnerRevision\s*\(/);
+ assert.match(server,/delta-action-cli\.mjs --review-only --stage-id \$stageId/);
+ assert.match(server,/ต้องการรับงานจริง ให้เจ้าของใช้ --add-action/);
  assert.match(cli,/confirmed:true/);assert.match(cli,/reviewed!=='REVIEWED'/);
  assert.match(cli,/confirm!=='CONFIRM'/);
  assert.match(cli,/'api','-X','GET'/);
