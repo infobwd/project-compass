@@ -96,3 +96,40 @@ export function summarizePrivateReviewCandidates(record){
   requiresOwnerReview:true
  };
 }
+
+
+// PC-04H — paginated owner-private review of the COMPLETE saved PR/Issue enumeration.
+// This does not refresh GitHub, assign priority, or create any owner action.
+export function buildPrivateCandidatePage(projection,workplan,{projectIndex,kind,page,pageSize=10}={}){
+ validateWorkplan(workplan,projection);
+ ok(Number.isInteger(projectIndex)&&projectIndex>=0&&projectIndex<projection.projects.length,
+   'project index out of selected scope');
+ ok(kind==='PR'||kind==='ISSUE','kind must be PR or ISSUE');
+ ok(Number.isInteger(page)&&page>=0&&page<=49,'page out of range');
+ ok(Number.isInteger(pageSize)&&pageSize>=1&&pageSize<=20,'page size out of range');
+ const project=projection.projects[projectIndex],owner=workplan.projects[projectIndex];
+ ok(project.id===owner.repository,'selected project mismatch');
+ const state=kind==='PR'?project.github?.openPRs:project.github?.openIssues;
+ const refs=kind==='PR'?project.github?.prReferences:project.github?.issueNumbers;
+ const verified=knownCollection(state===null?'UNKNOWN':'VERIFIED',state,refs,{kind});
+ if(!verified.complete)return {
+  mode:'PRIVATE_REVIEW_CANDIDATE_PAGE',repository:project.id,
+  projectIndex,kind,page:0,pageSize,total:null,pages:null,items:[],
+  enumeration:'PARTIAL_OR_UNKNOWN',missingSource:verified.reason,
+  observedAt:projection.observedAt,source:'SAVED_ENCRYPTED_GITHUB_SNAPSHOT_NOT_LIVE',
+  requiresOwnerReview:true,ownerTasksAdded:0,noWrites:true
+ };
+ const total=verified.items.length,pages=Math.ceil(total/pageSize);
+ ok(page<Math.max(1,pages),'page beyond available reference list');
+ const items=verified.items.slice(page*pageSize,(page+1)*pageSize).map(ref=>({
+  number:ref.number,draft:kind==='PR'?ref.draft:null,
+  priority:'NOT_ASSESSED',ownerConfirmed:false,ownerTaskCreated:false
+ }));
+ return {
+  mode:'PRIVATE_REVIEW_CANDIDATE_PAGE',repository:project.id,
+  projectIndex,kind,page,pageSize,total,pages,items,
+  enumeration:'SAVED_ENUMERATION_COMPLETE',missingSource:null,
+  observedAt:projection.observedAt,source:'SAVED_ENCRYPTED_GITHUB_SNAPSHOT_NOT_LIVE',
+  requiresOwnerReview:true,ownerTasksAdded:0,noWrites:true
+ };
+}
