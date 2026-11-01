@@ -19,7 +19,7 @@
 
 ## Acceptance decision
 **PC-03D2 synthetic automated QA: PASS (owner Windows screenshot).**  
-**PC-03D2 overall Local Acceptance: PENDING** only for exact tested commit SHA and interactive Logout → refresh / forbidden direct API retest. A completed manual check may satisfy this gate; no private-data unlock is authorized merely by test success.
+**PC-03D2 administrative Local Acceptance: CLOSED — OWNER_ACCEPTED_WITH_OPEN_EVIDENCE_EXCEPTIONS** by explicit user instruction on 2026-11-01; see [closure record](PC03D2_OWNER_LOCAL_ACCEPTANCE_CLOSURE_20261101.md). The exact tested commit SHA and interactive Logout → refresh / unauthorized direct API (401) retest remain **NOT VERIFIED**, not passed or waived. No private-data unlock is authorized by this administrative closure.
 
 User action: in PowerShell confirm `git rev-parse HEAD`, then (with new synthetic pairing code on a fresh server only if needed) log in, click Logout, reload, confirm LOCKED and no `/api/summary` or `/api/projects` access without re-pairing. Do not paste code/cookies/screenshots with secrets.
 
