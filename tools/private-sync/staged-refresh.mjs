@@ -91,6 +91,13 @@ function stageRead(folder,id){
  fail(JSON.stringify(keys)===JSON.stringify(['createdAt','encryptedSnapshot','format','id','oldDigest','selectionDigest'].sort()),'STAGE_FIELDS');
  return {bytes,record:obj,digest:hash(bytes)};
 }
+export function preflightEncryptedRefresh({folder,passphrase}){
+ const directory=safeDirectory(folder),sel=selected(directory);
+ const old=activeSnapshot(directory,passphrase,sel.names);
+ validateOwnerPlan(old.value,directory,passphrase,sel.names);
+ return {owner:sel.owner,selectedRepositories:[...sel.names],selected:sel.names.length,
+  mode:'PC04G_PREFLIGHT_NO_WRITES',oldPreserved:true};
+}
 export function stageEncryptedRefresh({folder,passphrase,candidate,clock=Date.now(),id=randomBytes(12).toString('hex')}){
  const directory=safeDirectory(folder),sel=selected(directory),old=activeSnapshot(directory,passphrase,sel.names);
  // Ensure already encrypted private plan can be read with old AND new selected snapshot.
