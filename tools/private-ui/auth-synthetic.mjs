@@ -4,6 +4,7 @@ import { createServer } from 'node:http';
 import { randomBytes, createHash, timingSafeEqual } from 'node:crypto';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { buildSyntheticEvidence } from './synthetic-evidence.mjs';
 
 const HOST = '127.0.0.1';
 const COOKIE = 'bwd_pc03d2';
@@ -27,12 +28,13 @@ const PAGE = `<!doctype html><html lang="th"><head><meta charset="utf-8"><meta n
 <p id="evidence-note" class="evidence-note"></p>
 <div class="details-head"><div><h2>รายละเอียดโครงการตัวอย่าง</h2><p>ต้องยืนยันแยกต่างหากก่อนแสดงรายชื่อสมมติ</p></div><button id="details" type="button" class="outline">แสดงรายละเอียดสมมติ</button></div>
 <ul id="projects" class="project-list" hidden></ul>
+<section class="evidence-wrap" aria-labelledby="axes-title"><div class="evidence-top"><div><h2 id="axes-title">5 มิติของหลักฐาน (ตัวอย่าง)</h2><p>แยก Git, การพัฒนา, การเผยแพร่, การตัดสินใจ และความเชื่อมั่น — ไม่อ้างสถานะโครงการจริง</p></div><button id="axes-button" type="button" class="outline" disabled>แสดงมิติหลักฐานสมมติ</button></div><div id="axes-content" class="axis-list" hidden></div></section>
 <div class="action-row"><button id="logout" type="button" class="secondary">ออกจากระบบและล็อกหน้าจอ</button></div></section></section>
 </main><footer>Read-only synthetic pilot · 127.0.0.1 only · No Snapshot · No Merge · No Deploy</footer></div></body></html>`;
-const CSS = `:root{color:#172b47;background:#f2f5fa;font-family:system-ui,"Segoe UI",sans-serif;font-synthesis:none}*{box-sizing:border-box}[hidden]{display:none!important}body{margin:0;min-height:100vh}.shell{max-width:1160px;margin:auto;padding:22px 26px 28px}.topbar,.identity,.paired-header,.details-head,.action-row{display:flex;align-items:center;gap:16px}.topbar{justify-content:space-between}.identity .brand-symbol{display:grid;place-items:center;width:40px;height:40px;border-radius:13px;background:#174c86;color:white;font-size:27px;font-weight:700}.identity span:last-child{display:flex;flex-direction:column;gap:2px}.identity strong{font-size:15px}.identity small{font-size:10px;letter-spacing:.09em;color:#6b7e99;font-weight:750}.mode-tag,.paired-badge{padding:9px 12px;border-radius:999px;background:#e5eef9;color:#164d83;font-size:11px;font-weight:800;letter-spacing:.06em}.main{max-width:800px;margin:38px auto}.intro{margin-bottom:23px}.eyebrow{font-size:11px;font-weight:800;color:#3b6797;letter-spacing:.11em}.intro h1{font-size:clamp(26px,4.8vw,42px);line-height:1.25;margin:12px 0}.intro h1 span{color:#2866a3}.intro p,.section-heading p,.details-head p,.evidence-note{line-height:1.65;color:#687c97}.intro p{max-width:650px}.panel{background:white;border:1px solid #dee6f1;border-radius:22px;padding:clamp(20px,4vw,34px);box-shadow:0 16px 45px #18314c0a}.section-heading h2,.paired-header h2,.details-head h2{font-size:21px;margin:6px 0}.section-heading p,.details-head p{font-size:14px;margin:6px 0 16px}.pair-form{display:grid;gap:12px}.pair-form label{font-size:14px;font-weight:700}.pair-form input{font:inherit;min-height:48px;padding:10px 14px;border:1px solid #95a9c7;border-radius:11px;width:100%}button{font:inherit;font-size:14px;min-height:44px;border-radius:11px;border:1px solid transparent;padding:11px 16px;cursor:pointer;font-weight:750}button:disabled{opacity:.65;cursor:default}button:focus-visible,input:focus-visible{outline:3px solid #d6a932;outline-offset:3px}.primary{color:white;background:#17518d}.secondary{color:white;background:#254e7b}.outline{border:1px solid #acc0dc;color:#18538d;background:white}.status{font-size:13px;font-weight:750;color:#1e5d95;min-height:20px;margin:18px 0 0}.paired-header{justify-content:space-between;align-items:flex-start;margin:4px 0 18px}.paired-badge{background:#e5f5ed;color:#146a45}.metric-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.metric{padding:16px;border:1px solid #dfe7f2;border-radius:15px;background:#f6f8fd;min-width:0}.metric dt{color:#667a95;font-size:12px;line-height:1.5}.metric dd{font-size:clamp(20px,3.5vw,28px);font-weight:800;margin:9px 0 2px;color:#1e4c80;overflow-wrap:anywhere}.metric-note{display:block;color:#75869b;font-size:11px;line-height:1.5}.evidence-note{font-size:12px;border-left:3px solid #e0b64c;padding-left:12px;margin:18px 0}.details-head{justify-content:space-between;align-items:end;flex-wrap:wrap;margin:24px 0 10px;padding-top:20px;border-top:1px solid #e4eaf3}.details-head h2{font-size:17px}.project-list{list-style:none;margin:0;padding:0;display:grid;gap:10px}.project-item{border:1px solid #dfe7f2;border-radius:14px;padding:15px 17px;background:#fbfcff}.project-item strong{font-size:16px}.project-meta{display:flex;flex-wrap:wrap;gap:9px;margin-top:9px}.project-meta span{font-size:12px;color:#496682;border-radius:8px;background:#eff4fa;padding:6px 8px}.action-row{justify-content:flex-end;margin-top:24px}footer{text-align:center;color:#71839d;font-size:12px;margin:28px 0 10px}@media(max-width:680px){.shell{padding:15px}.main{margin-top:27px}.metric-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.paired-header{align-items:flex-start}.details-head{align-items:stretch}.details-head button,.action-row button{width:100%}}@media(max-width:370px){.metric-grid{grid-template-columns:1fr}.mode-tag{font-size:9px;padding:7px}.topbar{gap:5px}}`;
+const CSS = `:root{color:#172b47;background:#f2f5fa;font-family:system-ui,"Segoe UI",sans-serif;font-synthesis:none}*{box-sizing:border-box}[hidden]{display:none!important}body{margin:0;min-height:100vh}.shell{max-width:1160px;margin:auto;padding:22px 26px 28px}.topbar,.identity,.paired-header,.details-head,.action-row{display:flex;align-items:center;gap:16px}.topbar{justify-content:space-between}.identity .brand-symbol{display:grid;place-items:center;width:40px;height:40px;border-radius:13px;background:#174c86;color:white;font-size:27px;font-weight:700}.identity span:last-child{display:flex;flex-direction:column;gap:2px}.identity strong{font-size:15px}.identity small{font-size:10px;letter-spacing:.09em;color:#6b7e99;font-weight:750}.mode-tag,.paired-badge{padding:9px 12px;border-radius:999px;background:#e5eef9;color:#164d83;font-size:11px;font-weight:800;letter-spacing:.06em}.main{max-width:800px;margin:38px auto}.intro{margin-bottom:23px}.eyebrow{font-size:11px;font-weight:800;color:#3b6797;letter-spacing:.11em}.intro h1{font-size:clamp(26px,4.8vw,42px);line-height:1.25;margin:12px 0}.intro h1 span{color:#2866a3}.intro p,.section-heading p,.details-head p,.evidence-note{line-height:1.65;color:#687c97}.intro p{max-width:650px}.panel{background:white;border:1px solid #dee6f1;border-radius:22px;padding:clamp(20px,4vw,34px);box-shadow:0 16px 45px #18314c0a}.section-heading h2,.paired-header h2,.details-head h2{font-size:21px;margin:6px 0}.section-heading p,.details-head p{font-size:14px;margin:6px 0 16px}.pair-form{display:grid;gap:12px}.pair-form label{font-size:14px;font-weight:700}.pair-form input{font:inherit;min-height:48px;padding:10px 14px;border:1px solid #95a9c7;border-radius:11px;width:100%}button{font:inherit;font-size:14px;min-height:44px;border-radius:11px;border:1px solid transparent;padding:11px 16px;cursor:pointer;font-weight:750}button:disabled{opacity:.65;cursor:default}button:focus-visible,input:focus-visible{outline:3px solid #d6a932;outline-offset:3px}.primary{color:white;background:#17518d}.secondary{color:white;background:#254e7b}.outline{border:1px solid #acc0dc;color:#18538d;background:white}.status{font-size:13px;font-weight:750;color:#1e5d95;min-height:20px;margin:18px 0 0}.paired-header{justify-content:space-between;align-items:flex-start;margin:4px 0 18px}.paired-badge{background:#e5f5ed;color:#146a45}.metric-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.metric{padding:16px;border:1px solid #dfe7f2;border-radius:15px;background:#f6f8fd;min-width:0}.metric dt{color:#667a95;font-size:12px;line-height:1.5}.metric dd{font-size:clamp(20px,3.5vw,28px);font-weight:800;margin:9px 0 2px;color:#1e4c80;overflow-wrap:anywhere}.metric-note{display:block;color:#75869b;font-size:11px;line-height:1.5}.evidence-note{font-size:12px;border-left:3px solid #e0b64c;padding-left:12px;margin:18px 0}.details-head{justify-content:space-between;align-items:end;flex-wrap:wrap;margin:24px 0 10px;padding-top:20px;border-top:1px solid #e4eaf3}.details-head h2{font-size:17px}.project-list{list-style:none;margin:0;padding:0;display:grid;gap:10px}.project-item{border:1px solid #dfe7f2;border-radius:14px;padding:15px 17px;background:#fbfcff}.project-item strong{font-size:16px}.project-meta{display:flex;flex-wrap:wrap;gap:9px;margin-top:9px}.project-meta span{font-size:12px;color:#496682;border-radius:8px;background:#eff4fa;padding:6px 8px}.action-row{justify-content:flex-end;margin-top:24px}.evidence-wrap{margin-top:26px;padding-top:20px;border-top:1px solid #e4eaf3}.evidence-top{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}.evidence-top h2{margin:5px 0;font-size:18px}.evidence-top p{font-size:13px;line-height:1.7;color:#667b97}.axis-list{display:grid;gap:13px;margin-top:14px}.axis-item{border:1px solid #dce6f4;border-radius:15px;background:#f9fbfe;padding:14px}.axis-item h3{font-size:16px;margin:2px 0 13px}.axis-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.axis-pill{padding:10px 12px;border-radius:10px;background:white;border:1px solid #e0e7ef;min-width:0}.axis-pill dt{font-size:12px;color:#617b99}.axis-pill dd{font-size:12px;font-weight:800;margin:4px 0 0;color:#1b4e80;overflow-wrap:anywhere}@media(max-width:430px){.axis-grid{grid-template-columns:1fr}}footer{text-align:center;color:#71839d;font-size:12px;margin:28px 0 10px}@media(max-width:680px){.shell{padding:15px}.main{margin-top:27px}.metric-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.paired-header{align-items:flex-start}.details-head{align-items:stretch}.details-head button,.action-row button{width:100%}}@media(max-width:370px){.metric-grid{grid-template-columns:1fr}.mode-tag{font-size:9px;padding:7px}.topbar{gap:5px}}`;
 const JS = `(function(){'use strict';
 const by=id=>document.getElementById(id);
-const pair=by('pair'), panel=by('private'), status=by('status'), detailButton=by('details'), list=by('projects');
+const pair=by('pair'), panel=by('private'), status=by('status'), detailButton=by('details'), list=by('projects'), axesButton=by('axes-button'), axesBox=by('axes-content');
 async function api(path,method,body){
  const options={method,credentials:'same-origin',headers:{'X-BWD-Local':'1'}};
  if(body!==undefined){options.headers['Content-Type']='application/json';options.body=JSON.stringify(body);}
@@ -48,6 +50,7 @@ function node(tag,text,className){
 }
 function reset(message){
  panel.hidden=true;pair.hidden=false;pair.reset();list.hidden=true;list.replaceChildren();
+ axesBox.hidden=true;axesBox.replaceChildren();axesButton.disabled=true;axesButton.textContent='แสดงมิติหลักฐานสมมติ';
  detailButton.disabled=false;detailButton.textContent='แสดงรายละเอียดสมมติ';
  by('summary').replaceChildren();status.textContent=message||'LOCKED — no real data loaded';
 }
@@ -85,6 +88,28 @@ function renderProjects(payload){
  });
  list.replaceChildren(...entries);list.hidden=false;
  detailButton.disabled=true;detailButton.textContent='กำลังแสดงรายละเอียดสมมติ';
+ axesButton.disabled=false;
+}
+function renderAxes(payload){
+ if(!payload||payload.mode!=='SYNTHETIC_ONLY'||payload.source!=='FICTIONAL_FIXTURE'||
+    payload.observedAt!==null||!Array.isArray(payload.projects))throw new Error('Unexpected evidence provenance');
+ const names={development:'การพัฒนา',git:'Git',deployment:'Deployment',decision:'Decision',confidence:'Confidence'};
+ const required=Object.keys(names);
+ const cards=payload.projects.map(project=>{
+   if(!project||typeof project.name!=='string'||!project.axes||required.some(axis=>!project.axes[axis]))
+     throw new Error('Invalid evidence');
+   const card=node('section','', 'axis-item');
+   card.append(node('h3',project.name));
+   const grid=node('dl','', 'axis-grid');
+   for(const axis of required){
+     const row=node('div','', 'axis-pill');
+     row.append(node('dt',names[axis]),node('dd',String(project.axes[axis].state||'UNKNOWN')));
+     grid.append(row);
+   }
+   card.append(grid);return card;
+ });
+ axesBox.replaceChildren(...cards);axesBox.hidden=false;
+ axesButton.disabled=true;axesButton.textContent='กำลังแสดงมิติหลักฐานสมมติ';
 }
 async function refresh(){
  try{renderSummary(await api('/api/summary','GET'));}
@@ -103,6 +128,10 @@ detailButton.addEventListener('click',async()=>{
  }catch{
   reset('ไม่สามารถยืนยันสิทธิ์แสดงรายละเอียด — ล็อกหน้าจอตัวอย่างแล้ว');
  }
+});
+axesButton.addEventListener('click',async()=>{
+ try{renderAxes(await api('/api/evidence','GET'));}
+ catch{reset('อ่านมิติหลักฐานไม่ได้หรือ Session หมดอายุ — LOCKED');}
 });
 by('logout').addEventListener('click',async()=>{
  try{await api('/session/logout','POST',{});reset('ออกจากระบบแล้ว — LOCKED');}
@@ -156,6 +185,11 @@ export async function startSyntheticPairingServer({now=()=>Date.now(),pairCode=r
       if(!sessionValid(req))return deny(res,401);
       if(!session.details)return deny(res,403);
       return send(res,200,json({mode:'SYNTHETIC_ONLY',projects:DATA}));
+    }
+    if(method==='GET'&&path==='/api/evidence'){
+      if(!sessionValid(req))return deny(res,401);
+      if(!session.details)return deny(res,403);
+      return send(res,200,json(buildSyntheticEvidence()));
     }
     if(method==='POST'&&['/session','/session/details','/session/logout'].includes(path)){
       if(req.headers.origin!==origin||req.headers['x-bwd-local']!=='1'||!(/^application\/json(?:\s*;|$)/i.test(req.headers['content-type']||'')))return deny(res);
