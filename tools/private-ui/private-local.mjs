@@ -17,7 +17,7 @@ const HEADERS=Object.freeze({
  'X-Content-Type-Options':'nosniff','X-Frame-Options':'DENY','Referrer-Policy':'no-referrer',
  'Cross-Origin-Resource-Policy':'same-origin','Permissions-Policy':'camera=(), microphone=(), geolocation=()'
 });
-const PAGE=`<!doctype html><html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>BWD Compass — Private Local</title><link rel="stylesheet" href="/style.css"><script defer src="/app.js"></script></head><body><div class="wrap"><header><strong>BWD Project Compass</strong><span class="tag">LOCAL · PRIVATE · READ ONLY</span></header><main><h1>Private Registry บนเครื่อง</h1><p class="notice">อ่าน Snapshot ที่ตรวจความครบถ้วนแล้ว ไม่ใช่ข้อมูล GitHub แบบ Live และไม่ยืนยัน Production</p><form id="pair"><label for="code">รหัสจับคู่ครั้งเดียวจาก PowerShell</label><input id="code" autocomplete="off" inputmode="text" maxlength="16" minlength="16" pattern="[A-Fa-f0-9]{16}" required><button type="submit">จับคู่เบราว์เซอร์</button></form><p id="status" role="status" aria-live="polite">LOCKED — ไม่แสดงข้อมูลส่วนตัว</p><section id="private" hidden><h2>สรุปหลักฐานที่บันทึกไว้</h2><div id="metrics" class="grid"></div><p id="freshness" class="note"></p><div class="row"><button id="details" type="button">ยืนยันและแสดงรายโครงการ</button><button id="logout" type="button" class="outline">ออกจากระบบ / ล้าง Session</button></div><div id="projects" hidden></div></section></main><footer>Local loopback only · ไม่มีการ Merge / Deploy / GitHub Sync</footer></div></body></html>`;
+const PAGE=`<!doctype html><html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>BWD Compass — Private Local</title><link rel="stylesheet" href="/style.css"><script defer src="/app.js"></script></head><body><div class="wrap"><header><strong>BWD Project Compass</strong><span class="tag">LOCAL · PRIVATE · READ ONLY</span></header><main><h1>Private Registry บนเครื่อง</h1><p class="notice">อ่าน Snapshot ที่ตรวจความครบถ้วนแล้ว ไม่ใช่ข้อมูล GitHub แบบ Live และไม่ยืนยัน Production</p><form id="pair"><label for="code">รหัสจับคู่ครั้งเดียวจาก PowerShell</label><input id="code" autocomplete="off" inputmode="text" maxlength="16" minlength="16" pattern="[A-Fa-f0-9]{16}" required><button type="submit">จับคู่เบราว์เซอร์</button></form><p id="status" role="status" aria-live="polite">LOCKED — ไม่แสดงข้อมูลส่วนตัว</p><section id="private" hidden><h2>สรุปหลักฐานที่บันทึกไว้</h2><div id="metrics" class="grid"></div><p id="freshness" class="note"></p><div class="row"><button id="details" type="button" aria-expanded="false" aria-controls="projects">ยืนยันและแสดงรายโครงการ</button><button id="logout" type="button" class="outline">ออกจากระบบ / ล้าง Session</button></div><div id="projects" hidden></div></section></main><footer>Local loopback only · ไม่มีการ Merge / Deploy / GitHub Sync</footer></div></body></html>`;
 const CSS=`:root{font-family:system-ui,"Segoe UI",sans-serif;color:#142f51;background:#f3f6fb}*{box-sizing:border-box}[hidden]{display:none!important}body{margin:0}.wrap{max-width:1000px;padding:20px;margin:auto}header,.row{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap}header{padding:12px 0}.tag{background:#e2edf9;color:#134b84;font-size:11px;font-weight:800;padding:8px 12px;border-radius:40px}main{background:white;padding:clamp(20px,4vw,42px);border:1px solid #dce5f0;border-radius:24px;margin:24px 0}h1{font-size:clamp(24px,4vw,38px)}h2{font-size:20px}p{line-height:1.6}.notice,.note,footer{color:#607791;font-size:14px}form{display:grid;gap:12px;margin:22px 0}label{font-weight:700}input{min-height:48px;padding:12px;border:1px solid #90a9c8;border-radius:10px;font:inherit}button{border:0;background:#1a5188;color:white;padding:12px 17px;border-radius:11px;min-height:44px;cursor:pointer;font:inherit;font-weight:700}button.outline{background:#edf3fa;color:#1a5188}.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.metric,.project{border:1px solid #d9e4f2;background:#f7f9fd;border-radius:14px;padding:14px;min-width:0}.metric strong{display:block;font-size:23px;margin-top:8px;overflow-wrap:anywhere}.metric span{font-size:12px;color:#617b99}.row{margin:20px 0}.project{margin-top:12px}.project h3{margin:0 0 10px;overflow-wrap:anywhere}.axes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.axis{border:1px solid #dce6f2;background:white;border-radius:10px;padding:10px;overflow-wrap:anywhere}.axis b{display:block;font-size:12px;color:#52708f}.axis span{font-size:12px;font-weight:750}footer{text-align:center;margin:20px}@media(max-width:600px){.grid,.axes{grid-template-columns:repeat(2,minmax(0,1fr))}.wrap{padding:12px}main{border-radius:14px}}@media(max-width:380px){.grid,.axes{grid-template-columns:1fr}}button:focus-visible,input:focus-visible{outline:3px solid #d6a239;outline-offset:3px}`;
 const JS=`(()=>{'use strict';
 const el=id=>document.getElementById(id);
@@ -31,7 +31,7 @@ async function api(path,method='GET',body){
 }
 function lock(message='LOCKED — ไม่แสดงข้อมูลส่วนตัว'){
  panel.hidden=true;pair.hidden=false;pair.reset();el('metrics').replaceChildren();
- projects.hidden=true;projects.replaceChildren();status.textContent=message;
+ projects.hidden=true;projects.replaceChildren();el('details').disabled=false;el('details').textContent='ยืนยันและแสดงรายโครงการ';el('details').setAttribute('aria-expanded','false');status.textContent=message;
 }
 function metric(label,value){const c=element('div','','metric');c.append(element('span',label),element('strong',value===null?'UNKNOWN':value));return c;}
 function renderSummary(s){
@@ -39,7 +39,10 @@ function renderSummary(s){
  el('metrics').replaceChildren(metric('Repository ที่เลือก',s.selected),metric('HEAD ตรวจสอบแล้ว',s.headVerified),
   metric('Open PRs',s.openPRsTotal),metric('Open Issues',s.openIssuesTotal),
   metric('Host Deployment',s.deployment),metric('Acceptance',s.acceptance));
- el('freshness').textContent='บันทึกเมื่อ '+s.observedAt+' · อายุหลักฐาน '+s.freshness+' · Git default branch ไม่ยืนยัน Production';
+ const date=new Date(s.observedAt);
+ const localTime=Number.isFinite(date.getTime())?new Intl.DateTimeFormat('th-TH',{dateStyle:'medium',timeStyle:'short',timeZone:'Asia/Bangkok'}).format(date):'ไม่ระบุเวลา';
+ const ageLabel=s.freshness==='RECENT'?'RECENT (ไม่ใช่ GitHub Live)':s.freshness==='AGING'?'AGING (ควรตรวจใหม่)':s.freshness==='STALE'?'STALE (ห้ามอ้างสถานะปัจจุบัน)':'CLOCK_SKEW / UNKNOWN';
+ el('freshness').textContent='บันทึกเมื่อ '+localTime+' (เวลาไทย) · อายุหลักฐาน '+ageLabel+' · Git default branch ไม่ยืนยัน Production';
  panel.hidden=false;pair.hidden=true;status.textContent='PAIRED — Private local read-only';
 }
 function renderProjects(d){
@@ -54,7 +57,7 @@ function renderProjects(d){
   }
   card.append(grid);return card;
  });
- projects.replaceChildren(...nodes);projects.hidden=false;el('details').disabled=true;
+ projects.replaceChildren(...nodes);projects.hidden=false;el('details').disabled=true;el('details').textContent='กำลังแสดงรายละเอียดรายโครงการ';el('details').setAttribute('aria-expanded','true');
 }
 pair.addEventListener('submit',async event=>{
  event.preventDefault();const code=el('code').value;el('code').value='';
