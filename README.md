@@ -239,3 +239,12 @@ After owner-reported PC-04G encrypted Snapshot activation and post-activation ve
 - Incomplete/invalid numbers **fail closed**; a project with a complete enumeration shows "ดู PR/Issue ทั้งหมดจาก Snapshot" only when the short preview omits entries. Prev/Next is numerical lookup, not priority or approval.
 - An owner may select any displayed number for the existing **ephemeral, unsaved** PC-04F worksheet. No new file write, task creation, GitHub API call, 07:00 automatic refresh, Merge, Deploy or real private data in public Pages.
 - Eight fictional-only tests. Exact Windows regression, Build/Public Scan, 401/403 and Logout QA **PENDING**; PC-04G local acceptance is OWNER-REPORTED, not independently host-verified.
+
+
+### PC-04I — Saved GitHub Snapshot delta (Private Local Draft)
+Following owner-reported PC-04H PASS, use **exact activated encrypted current Snapshot vs exact previous encrypted backup**, verified against the Stage SHA-256 digests and selected owner/workplan scope. Review PR/Issue numbers newly seen **OPEN** and numbers no longer seen **OPEN**, default-head changes where verified, and PR Draft/HEAD changes. These are **two stored GitHub observations, not live status or Merge/Deploy evidence**. [Full owner-local Windows QA and confidentiality runbook](docs/PC04I_PRIVATE_SNAPSHOT_DELTA_RUNBOOK.md).
+
+- `node tools/private-sync/snapshot-delta-cli.mjs --summary --stage-id ID`: safe aggregate-only summary with hidden terminal passphrase, **no network/file write**; `--details` requires separately typing `DISPLAY` to show private names and numeric references locally.
+- `node tools/private-ui/private-delta-local.mjs --ack-private-workplan-local --delta-stage-id ID`: new **explicitly opt-in** paired 127.0.0.1 browser view, with Thai delta aggregate section and per-project details **only after separate step-up authorization**. Existing private viewer without opt-in returns HTTP 404 for the new endpoints.
+- Compare refuses absent/changed encrypted old backup, nonmatching current active Stage, changed selected configuration, wrong passphrase, incomplete/duplicate PR/Issue enumerations, or owner workplan scope mismatch. It does **not** refresh Snapshot, mark work complete, create TODO or write host/GitHub data.
+- 16 synthetic-only regression tests added; Windows full tests/build/public scan/manual browser acceptance **PENDING**. Public `src/` and Pages unchanged; no Merge/Deploy or real private data in public Git.
