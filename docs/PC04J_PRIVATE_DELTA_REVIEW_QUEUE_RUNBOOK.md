@@ -23,7 +23,7 @@ PC-04I showed up to 12 changed IDs per category and an omission count. PC-04J pr
 Stop the old private Node viewer (Ctrl+C). On the existing D: working copy, preserve all uncommitted files. Never use `reset --hard` or `git clean` as a shortcut.
 
 ```powershell
-Set-Location 'D:\BWD-Compass\project-compass'
+Set-Location '<LOCAL_PROJECT_WORKTREE_ON_D>'
 git status --short
 git fetch origin --prune
 git switch --track origin/feat/pc04j-private-delta-review-queue-20261101
@@ -43,12 +43,12 @@ PC-04J adds **12 synthetic-only tests** (6 pure model + 6 local HTTP/UI). PC-04I
 **Do not create another Stage or Activate**; use the encrypted selected Snapshot/old backup verified during PC-04I and the exact **already activated** Stage ID. Run on the same trusted Windows computer:
 
 ```powershell
-$env:BWD_COMPASS_PRIVATE_DIR = 'D:\BWD-Compass-Private\private'
-$stageId = '36cc69fe420763d31df8e460'
+$env:BWD_COMPASS_PRIVATE_DIR = '<OWNER_PROTECTED_PRIVATE_DIRECTORY_OUTSIDE_GIT>'
+$stageId = 'ACTUAL_24_HEX_ID'
 node tools/private-ui/private-delta-local.mjs --ack-private-workplan-local --delta-stage-id $stageId
 ```
 
-Enter the existing passphrase only in the private Terminal. Open the exact printed `http://127.0.0.1:PORT/` on the same PC, use the one-time pairing code and separate confirmation to show details.
+Replace \`ACTUAL_24_HEX_ID\` with the exact already activated 24-character hexadecimal Stage ID from your private Windows Terminal (do not type angle brackets into the CLI). Enter the existing passphrase only in the private Terminal. Open the exact printed `http://127.0.0.1:PORT/` on the same PC, use the one-time pairing code and separate confirmation to show details.
 
 ### Owner acceptance checklist
 
