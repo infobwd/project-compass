@@ -114,6 +114,16 @@ M5 remains OPEN: after M3 approval, use a minimal, private-only acceptance works
 
 Use a private-only worksheet to record: reviewed machine, tested exact HEAD, observed local HTTP statuses, residual threat risks, owner decision and date, and confirmation that no private registry content was exported. Publish only **redacted PASS / HOLD / UNKNOWN** and evidence category in the public Draft PR. Do not elevate source-check PASS to Host or real-data acceptance.
 
+## M5 — Owner local post-logout follow-up received (2026-11-01)
+
+**Evidence classification: OWNER-REPORTED FOLLOW-UP, NOT INDEPENDENT FULL M5 PASS.** Following the screenshots showing actual authorized local Snapshot-only pairing, detail opt-in, protected `projects` 200, Logout 204 and a LOCKED browser view, the owner replied **"ได้แล้วทำส่วนถัดไป"** to the instructions to check the protected API after Logout, reload/verify that private cards do not reappear, stop Node, and compare encrypted Snapshot/Workplan SHA-256 plus private-directory filename inventory. Treat this as the owner's report that the requested checks were performed. **The exact after-logout status and three True/False console lines were not included in that reply or separately captured here.** Do not invent them as independent results or publish any original digest/private path.
+
+The earlier optional `/api/workplan/summary`, `/api/morning/summary`, `/api/candidates/summary`, and `/api/delta/summary` 404 responses were explained by source inspection as **expected for Snapshot-only mode** (optional owner Workplan / saved Delta not loaded). They are not success/failure of the mandatory protected `/api/summary` authentication check.
+
+**Remaining strict criteria:** actual real-private **403** for paired-but-not-details step-up was not individually evidenced in the screenshots; complete after-logout **401** and three immutable-file values are **owner-reported only**, not available as raw status-only captures. M5 = `OWNER_REPORTED_CORE_CHECKS / INDEPENDENT_FINAL_ACCEPTANCE_HOLD`; no re-run of earlier synthetic M2 required, but one targeted real-private 403 or an appropriately redacted owner status-only acceptance record is needed before representing the full five-step real-browser sequence as verified.
+
+Advance planning/documentation and public/private release separation without gating the owner on repeated browser tests. **Never Merge/Deploy the stacked private implementation into public `main`**, and never infer real TODO-write, Host, or Production readiness from M5 read-only tests.
+
 ## Release restriction / rollback
 
 - No automatic Merge, Deploy, encrypted Workplan write, live Stage refresh, repository migration, remote secret export, Git history rewrite or browser launch.
