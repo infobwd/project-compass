@@ -2,6 +2,8 @@
 
 **STATUS: Code pilot on Draft branch. Windows exact-HEAD tests pending. No Merge / Deploy.**
 
+**Latest Windows diagnostic note:** The owner saw 122/122 tests, build, public scan and preflight PASS, but an older masked dummy `--input-check` returned `PC04B_INPUT_CHECK_SECRET_FAILED`. The new [v2 dummy keyboard test](PC04B_INPUT_DIAGNOSTIC_V2_20261101.md) now checks visible `TEST` → hidden `TEST` → visible `1` with distinct safe error codes. Run that before any real `--add-action`; the existing encrypted plan is not touched by the dummy test.
+
 ## Verified preceding owner evidence (PC-04A)
 Owner's 2026-11-01 Windows PowerShell screenshot shows `--check` reported no existing workplan, `--init` created the encrypted workplan for **11 selected projects** without overwriting, then `--summary` read it back. Initial states: ownerReviewed **0**, openActions **0**, overdueActions **0**, decisionsPending **11**, hostReviewedByOwner **0**. These figures are **empty-plan defaults**, NOT evidence that the real projects have zero unfinished work. [Sanitized record](PC04A_OWNER_INIT_ACCEPTANCE_20261101.md). Exact PC-04A test SHA, Node test/build/public scan remain separately unverified.
 
