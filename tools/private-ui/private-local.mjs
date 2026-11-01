@@ -11,6 +11,7 @@ import { parseSelection } from '../private-sync/selection.mjs';
 import { projectOfflineEvidence } from './offline-projection.mjs';
 import { readPrivateWorkplanFile } from '../private-plan/encrypted-workplan.mjs';
 import { validateWorkplan,summarizeWorkplan } from '../private-plan/workplan-model.mjs';
+import { buildPrivateMorningBrief } from '../private-plan/morning-brief.mjs';
 
 const HOST='127.0.0.1', COOKIE='bwd_pc_real', MAX_BYTES=8*1024*1024;
 const HEADERS=Object.freeze({
@@ -19,7 +20,7 @@ const HEADERS=Object.freeze({
  'X-Content-Type-Options':'nosniff','X-Frame-Options':'DENY','Referrer-Policy':'no-referrer',
  'Cross-Origin-Resource-Policy':'same-origin','Permissions-Policy':'camera=(), microphone=(), geolocation=()'
 });
-const PAGE=`<!doctype html><html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>BWD Compass — Private Local</title><link rel="stylesheet" href="/style.css"><script defer src="/app.js"></script></head><body><div class="wrap"><header><strong>BWD Project Compass</strong><span class="tag">LOCAL · PRIVATE · READ ONLY</span></header><main><h1>Private Registry บนเครื่อง</h1><p class="notice">อ่าน Snapshot ที่ตรวจความครบถ้วนแล้ว ไม่ใช่ข้อมูล GitHub แบบ Live และไม่ยืนยัน Production</p><form id="pair"><label for="code">รหัสจับคู่ครั้งเดียวจาก PowerShell</label><input id="code" autocomplete="off" inputmode="text" maxlength="16" minlength="16" pattern="[A-Fa-f0-9]{16}" required><button type="submit">จับคู่เบราว์เซอร์</button></form><p id="status" role="status" aria-live="polite">LOCKED — ไม่แสดงข้อมูลส่วนตัว</p><section id="private" hidden><h2>สรุปหลักฐานที่บันทึกไว้</h2><div id="metrics" class="grid"></div><p id="freshness" class="note"></p><div class="row"><button id="details" type="button" aria-expanded="false" aria-controls="projects">ยืนยันและแสดงรายโครงการ</button><button id="logout" type="button" class="outline">ออกจากระบบ / ล้าง Session</button></div><section id="workplan" hidden><h2>ทะเบียนงานที่เจ้าของบันทึกไว้</h2><p class="note">ข้อมูลจากไฟล์แผนงานส่วนตัว ไม่ใช่ GitHub Live · ไม่มีการเพิ่มงานอัตโนมัติ</p><div id="workplan-summary" class="grid"></div><p id="workplan-note" class="note"></p><div id="workplan-actions" hidden></div></section><div id="projects" hidden></div></section></main><footer>Local loopback only · ไม่มีการ Merge / Deploy / GitHub Sync</footer></div></body></html>`;
+const PAGE=`<!doctype html><html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>BWD Compass — Private Local</title><link rel="stylesheet" href="/style.css"><script defer src="/app.js"></script></head><body><div class="wrap"><header><strong>BWD Project Compass</strong><span class="tag">LOCAL · PRIVATE · READ ONLY</span></header><main><h1>Private Registry บนเครื่อง</h1><p class="notice">อ่าน Snapshot ที่ตรวจความครบถ้วนแล้ว ไม่ใช่ข้อมูล GitHub แบบ Live และไม่ยืนยัน Production</p><form id="pair"><label for="code">รหัสจับคู่ครั้งเดียวจาก PowerShell</label><input id="code" autocomplete="off" inputmode="text" maxlength="16" minlength="16" pattern="[A-Fa-f0-9]{16}" required><button type="submit">จับคู่เบราว์เซอร์</button></form><p id="status" role="status" aria-live="polite">LOCKED — ไม่แสดงข้อมูลส่วนตัว</p><section id="private" hidden><h2>สรุปหลักฐานที่บันทึกไว้</h2><div id="metrics" class="grid"></div><p id="freshness" class="note"></p><div class="row"><button id="details" type="button" aria-expanded="false" aria-controls="projects">ยืนยันและแสดงรายโครงการ</button><button id="logout" type="button" class="outline">ออกจากระบบ / ล้าง Session</button></div><section id="workplan" hidden><h2>ทะเบียนงานที่เจ้าของบันทึกไว้</h2><p class="note">ข้อมูลจากไฟล์แผนงานส่วนตัว ไม่ใช่ GitHub Live · ไม่มีการเพิ่มงานอัตโนมัติ</p><div id="workplan-summary" class="grid"></div><p id="workplan-note" class="note"></p><div id="workplan-actions" hidden></div></section><section id="morning" hidden><h2>สรุปงานวันนี้ · Morning Brief</h2><p class="note">ข้อมูลจาก Snapshot ที่บันทึกไว้และงานที่เจ้าของบันทึกจริง ไม่ใช่ GitHub Live · ไม่ยืนยันว่า Deploy หรือเสร็จแล้ว</p><div id="morning-counts" class="grid"></div><p id="morning-context" class="note"></p><div id="morning-detail" hidden></div></section><div id="projects" hidden></div></section></main><footer>Local loopback only · ไม่มีการ Merge / Deploy / GitHub Sync</footer></div></body></html>`;
 const CSS=`:root{font-family:system-ui,"Segoe UI",sans-serif;color:#142f51;background:#f3f6fb}*{box-sizing:border-box}[hidden]{display:none!important}body{margin:0}.wrap{max-width:1000px;padding:20px;margin:auto}header,.row{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap}header{padding:12px 0}.tag{background:#e2edf9;color:#134b84;font-size:11px;font-weight:800;padding:8px 12px;border-radius:40px}main{background:white;padding:clamp(20px,4vw,42px);border:1px solid #dce5f0;border-radius:24px;margin:24px 0}h1{font-size:clamp(24px,4vw,38px)}h2{font-size:20px}p{line-height:1.6}.notice,.note,footer{color:#607791;font-size:14px}form{display:grid;gap:12px;margin:22px 0}label{font-weight:700}input{min-height:48px;padding:12px;border:1px solid #90a9c8;border-radius:10px;font:inherit}button{border:0;background:#1a5188;color:white;padding:12px 17px;border-radius:11px;min-height:44px;cursor:pointer;font:inherit;font-weight:700}button.outline{background:#edf3fa;color:#1a5188}.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.metric,.project{border:1px solid #d9e4f2;background:#f7f9fd;border-radius:14px;padding:14px;min-width:0}.metric strong{display:block;font-size:23px;margin-top:8px;overflow-wrap:anywhere}.metric span{font-size:12px;color:#617b99}.row{margin:20px 0}.project{margin-top:12px}.project h3{margin:0 0 10px;overflow-wrap:anywhere}.axes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.axis{border:1px solid #dce6f2;background:white;border-radius:10px;padding:10px;overflow-wrap:anywhere}.axis b{display:block;font-size:12px;color:#52708f}.axis span{font-size:12px;font-weight:750}footer{text-align:center;margin:20px}@media(max-width:600px){.grid,.axes{grid-template-columns:repeat(2,minmax(0,1fr))}.axes{grid-template-columns:1fr}.axis span{overflow-wrap:anywhere;word-break:normal}.row button{width:100%}.wrap{padding:12px}main{border-radius:14px}.metric{min-width:0}.metric strong{font-size:22px}}@media(max-width:380px){.grid,.axes{grid-template-columns:1fr}}button:focus-visible,input:focus-visible{outline:3px solid #d6a239;outline-offset:3px}`;
 const JS=`(()=>{'use strict';
 const el=id=>document.getElementById(id);
@@ -36,6 +37,8 @@ function lock(message='LOCKED — ไม่แสดงข้อมูลส่�
  projects.hidden=true;projects.replaceChildren();
  el('workplan').hidden=true;el('workplan-summary').replaceChildren();el('workplan-note').textContent='';
  el('workplan-actions').hidden=true;el('workplan-actions').replaceChildren();
+ el('morning').hidden=true;el('morning-counts').replaceChildren();el('morning-context').textContent='';
+ el('morning-detail').hidden=true;el('morning-detail').replaceChildren();
  el('details').disabled=false;el('details').textContent='ยืนยันและแสดงรายโครงการ';el('details').setAttribute('aria-expanded','false');status.textContent=message;
 }
 function metric(label,value){const c=element('div','','metric');c.append(element('span',label),element('strong',value===null?'UNKNOWN':value));return c;}
@@ -78,6 +81,56 @@ function renderOwnerActions(d){
  if(d.truncated)root.append(element('p','รายการบางส่วนถูกจำกัดจำนวนเพื่อการแสดงผล กรุณาอ่านไฟล์ส่วนตัวผ่าน CLI','note'));
  root.hidden=false;
 }
+function renderMorningSummary(b){
+ if(!b||b.mode!=='OWNER_PRIVATE_MORNING_SUMMARY')throw Error('Invalid private morning summary');
+ el('morning-counts').replaceChildren(
+  metric('งานที่เจ้าของบันทึกว่ายังต้องทำ',b.openActions),
+  metric('งานเกินกำหนดตามเวลาไทย',b.overdueActions),
+  metric('โครงการรอการตัดสินใจ',b.waitingDecision),
+  metric('โครงการต้องตรวจหลักฐาน',b.reviewPrompts));
+ const dated=new Date(b.observedAt);
+ const when=Number.isFinite(dated.getTime())
+  ?new Intl.DateTimeFormat('th-TH',{dateStyle:'medium',timeStyle:'short',timeZone:'Asia/Bangkok'}).format(dated)
+  :'ไม่ทราบเวลาบันทึกหลักฐาน';
+ el('morning-context').textContent='รายงานวันที่ '+b.dayBangkok+
+  ' · Snapshot บันทึก '+when+' · '+b.freshness+
+  ' · ไม่ใช่ GitHub Live · งาน 0 หมายถึงยังไม่บันทึก TODO ไม่ใช่งานจริงเสร็จแล้ว';
+ el('morning').hidden=false;
+}
+function renderMorningDetails(b){
+ if(!b||b.mode!=='OWNER_PRIVATE_MORNING_DETAILS'||!Array.isArray(b.actions)||!Array.isArray(b.reviewPrompts))
+  throw Error('Invalid private morning details');
+ const parent=el('morning-detail');parent.replaceChildren();
+ parent.append(element('h3','งานถัดไปที่เจ้าของบันทึกจริง'));
+ if(b.actions.length===0)parent.append(element('p','ยังไม่มี TODO ที่บันทึกในทะเบียน ไม่ได้หมายความว่าโครงการไม่มีงานค้าง','note'));
+ for(const task of b.actions){
+  const card=element('article','','project');
+  card.append(element('h3',task.title));
+  card.append(element('p','โครงการ '+task.repository+' · '+task.priority+' · '+task.status+(task.overdue?' · เกินกำหนด':'')+' · '+task.owner));
+  if(task.dueDate)card.append(element('p','ครบกำหนด '+task.dueDate));
+  if(task.nextStep)card.append(element('p','ทำต่อ '+task.nextStep));
+  parent.append(card);
+ }
+ if(b.moreActions)parent.append(element('p','มีงานเพิ่มเติมที่ไม่ได้แสดง ให้ดูผ่านระบบส่วนตัวหลังทบทวนสิทธิ์','note'));
+ parent.append(element('h3','สิ่งที่ควรตรวจสอบ — ยังไม่ใช่งานที่รับรองแล้ว'));
+ const labels={OWNER_REVIEW_NOT_RECORDED:'ยังไม่มีบันทึกตรวจโดยเจ้าของ',
+   DEVELOPMENT_NOT_OWNER_ACCEPTED:'ยังไม่รับรองการพัฒนา',
+   HOST_NOT_OWNER_REVIEWED:'ยังไม่ได้บันทึกผลตรวจ Host',
+   OWNER_DECISION_PENDING:'รอการตัดสินใจ',
+   NO_ACTION_RECORDED:'ยังไม่มี TODO ที่บันทึก'};
+ for(const entry of b.reviewPrompts){
+  const card=element('article','','project');card.append(element('h3',entry.repository));
+  const reasons=entry.missing.map(code=>labels[code]??'หลักฐานยังไม่ครบ');
+  card.append(element('p',reasons.join(' · '),'note'));
+  parent.append(card);
+ }
+ if(b.moreReviews)parent.append(element('p','มีโครงการที่ควรตรวจเพิ่มเติม รายงานนี้จำกัดจำนวนรายการเพื่อความปลอดภัย','note'));
+ parent.hidden=false;
+}
+async function showMorningSummaryIfAvailable(){
+ try{renderMorningSummary(await api('/api/morning/summary'));return true;}
+ catch{el('morning').hidden=true;return false;}
+}
 async function showOwnerSummaryIfAvailable(){
  try{renderOwnerSummary(await api('/api/workplan/summary'));return true;}
  catch{el('workplan').hidden=true;return false;}
@@ -98,17 +151,17 @@ function renderProjects(d){
 }
 pair.addEventListener('submit',async event=>{
  event.preventDefault();const code=el('code').value;el('code').value='';
- try{await api('/session','POST',{code});renderSummary(await api('/api/summary'));await showOwnerSummaryIfAvailable();}
+ try{await api('/session','POST',{code});renderSummary(await api('/api/summary'));await showOwnerSummaryIfAvailable();await showMorningSummaryIfAvailable();}
  catch{lock('จับคู่ไม่สำเร็จหรือรหัสหมดอายุ — โปรดเริ่ม Server ใหม่หากจำเป็น');}
 });
 el('details').addEventListener('click',async()=>{
- try{await api('/session/details','POST',{});renderProjects(await api('/api/projects'));if(!el('workplan').hidden)renderOwnerActions(await api('/api/workplan/actions'));}catch{lock('Session ไม่ได้รับอนุญาต — LOCKED');}
+ try{await api('/session/details','POST',{});renderProjects(await api('/api/projects'));if(!el('workplan').hidden)renderOwnerActions(await api('/api/workplan/actions'));if(!el('morning').hidden)renderMorningDetails(await api('/api/morning/details'));}catch{lock('Session ไม่ได้รับอนุญาต — LOCKED');}
 });
 el('logout').addEventListener('click',async()=>{
  try{await api('/session/logout','POST',{});lock('LOCKED — ออกจากระบบแล้ว; เริ่ม Server ใหม่หากต้องการเข้าอีกครั้ง');}
  catch{lock('ไม่ยืนยันการ Logout จาก Server — โปรดปิด Server ด้วย Ctrl+C');}
 });
-api('/api/summary').then(async s=>{renderSummary(s);await showOwnerSummaryIfAvailable();}).catch(()=>lock());
+api('/api/summary').then(async s=>{renderSummary(s);await showOwnerSummaryIfAvailable();await showMorningSummaryIfAvailable();}).catch(()=>lock());
 })();`;
 const hash=value=>createHash('sha256').update(value).digest();
 const respond=(res,status,body='',type='application/json; charset=utf-8',extra={})=>{
@@ -180,6 +233,31 @@ export async function startOwnerLocalServer({projection,workplan=null,now=()=>Da
    return respond(res,200,JSON.stringify({mode:'PRIVATE_LOCAL_SUMMARY',selected:data.selected,
     headVerified:a.gitHead.verified,openPRsTotal:a.pullRequests.total,openIssuesTotal:a.issues.total,
     observedAt:data.observedAt,freshness:data.freshness.state,deployment:'NOT_VERIFIED',acceptance:'NOT_VERIFIED'}));
+  }
+  if(method==='GET'&&path==='/api/morning/summary'){
+   if(!active(req))return deny(res,401);
+   if(!ownerPlan)return deny(res,404);
+   const brief=buildPrivateMorningBrief(data,ownerPlan,{now:new Date(now()).toISOString()});
+   return respond(res,200,JSON.stringify({mode:'OWNER_PRIVATE_MORNING_SUMMARY',
+    dayBangkok:brief.dayBangkok,observedAt:brief.github.observedAt,freshness:brief.github.freshness,
+    openActions:brief.ownerPlan.openActions,overdueActions:brief.ownerPlan.overdueActions,
+    waitingDecision:brief.ownerPlan.waitingDecision,reviewPrompts:brief.reviewPrompts.length,
+    source:'SAVED_ENCRYPTED_SNAPSHOT_NOT_LIVE',liveGitHubChecked:false,
+    deploymentInferred:false}));
+  }
+  if(method==='GET'&&path==='/api/morning/details'){
+   if(!active(req))return deny(res,401);
+   if(!ownerPlan)return deny(res,404);
+   if(!session.details)return deny(res,403);
+   const brief=buildPrivateMorningBrief(data,ownerPlan,{now:new Date(now()).toISOString()});
+   return respond(res,200,JSON.stringify({mode:'OWNER_PRIVATE_MORNING_DETAILS',
+    dayBangkok:brief.dayBangkok,
+    actions:brief.actualOpenActions.slice(0,30).map(a=>({repository:a.repository,
+     title:a.title,status:a.status,priority:a.priority,owner:a.owner,
+     dueDate:a.dueDate,overdue:a.overdue,nextStep:a.nextStep})),
+    reviewPrompts:brief.reviewPrompts.slice(0,25).map(r=>({repository:r.repository,missing:r.missing})),
+    moreActions:brief.actualOpenActions.length>30,moreReviews:brief.reviewPrompts.length>25,
+    source:'OWNER_LOCAL_REVIEW_PROMPTS_NOT_VERIFIED',noWrites:true}));
   }
   if(method==='GET'&&path==='/api/workplan/summary'){
    if(!active(req))return deny(res,401);
