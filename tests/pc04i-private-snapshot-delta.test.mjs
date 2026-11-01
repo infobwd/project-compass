@@ -24,7 +24,7 @@ function snap(at,{fresh=false}={}){
   return {fullName,repositoryId:1000+i,visibility:'private',defaultBranch:'main',
    defaultHead:{state:'VERIFIED',sha:fresh&&i===0?ALT:SHA},
    openPRs:{state:'VERIFIED',count:prs.length,atLeast:prs.length,items:prs.map(n=>({
-    number:n,draft:n===2?fresh:n%2===0,headSha:n===2&&fresh?ALT:SHA,base:'main'
+    number:n,draft:n===2?!fresh:n%2===0,headSha:n===2&&fresh?ALT:SHA,base:'main'
    }))},
    openIssues:{state:'VERIFIED',count:issues.length,atLeast:issues.length,numbers:issues}};
  });
