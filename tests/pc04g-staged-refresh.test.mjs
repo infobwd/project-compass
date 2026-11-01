@@ -11,7 +11,7 @@ import {createEmptyWorkplan} from '../tools/private-plan/workplan-model.mjs';
 import {createPrivateWorkplanFile} from '../tools/private-plan/encrypted-workplan.mjs';
 import {stageEncryptedRefresh,inspectEncryptedRefresh,activateEncryptedRefresh,
  preflightEncryptedRefresh} from '../tools/private-sync/staged-refresh.mjs';
-import {runRefreshCLI} from '../tools/private-sync/staged-refresh-cli.mjs';
+import {runRefreshCLI,safeRefreshErrorCode} from '../tools/private-sync/staged-refresh-cli.mjs';
 
 const OWNER='fictional-owner',NAME=OWNER+'/fictional-repo',PASS='fictional-test-passphrase-never-real';
 const OLD='2026-11-01T00:00:00.000Z',NEW='2026-11-01T01:00:00.000Z',CLOCK=Date.parse('2026-11-01T02:00:00Z');
@@ -142,4 +142,34 @@ test('PC04G CLI help/invalid argument parsing does not read private files',async
  assert.equal(help.mode,'HELP');
  await assert.rejects(()=>runRefreshCLI(['--activate','--stage-id','../../bad'],{}),/PC04G_INVALID_ARGUMENTS/);
  await assert.rejects(()=>runRefreshCLI(['--stage','--owner','fake'],{}),/PC04G_INVALID_ARGUMENTS/);
+});
+
+test('PC04G diagnostic classifier returns only allowlisted cause codes, not private metadata',()=>{
+ const fake=[
+  [Error('Invalid private workplan: selection scope'),'OWNER_WORKPLAN_SELECTION_MISMATCH'],
+  [Error('Invalid private workplan: selected registry order mismatch'),'OWNER_WORKPLAN_SELECTION_MISMATCH'],
+  [Error('Not an explicitly selected private snapshot'),'SELECTED_SNAPSHOT_SCOPE_INVALID'],
+  [Error('PC04G_REFUSED_ENUMERATION_INCOMPLETE_PR'),'REFUSED_ENUMERATION_INCOMPLETE_PR'],
+  [Error('GitHub read failed for fictional-owner/fictional-repo with passphrase FAKE-SECRET'),'UNCLASSIFIED_STOP'],
+  [Object.assign(Error('Private file missing: C:\\FICTIONAL-PATH'),{code:'ENOENT'}),'PRIVATE_REQUIRED_FILE_MISSING'],
+  [Object.assign(Error('Access denied C:\\FICTIONAL-PATH'),{code:'EACCES'}),'LOCAL_FILESYSTEM_ACCESS_DENIED']
+ ];
+ for(const [err,expected] of fake){
+  const code=safeRefreshErrorCode(err);
+  assert.equal(code,expected);
+  assert.match(code,/^[A-Z0-9_]+$/);
+  assert.doesNotMatch(code,/fictional-owner|fictional-repo|FAKE-SECRET|FICTIONAL-PATH/);
+ }
+});
+test('PC04G diagnosis mode is explicitly preflight-only, while stage and activation remain manual',()=>{
+ const file=readFileSync(new URL('../tools/private-sync/staged-refresh-cli.mjs',import.meta.url),'utf8');
+ assert.match(file,/args\[0\]==='--diagnose'/);
+ assert.match(file,/command\.operation==='diagnose'\)\s*return \{mode:'PRIVATE_PREFLIGHT_PASS'/);
+ assert.ok(file.indexOf("if(command.operation==='diagnose')")<
+   file.indexOf("const auth=spawnSync('gh',['auth','status']"));
+ assert.match(file,/phase\('PRIVATE_PREFLIGHT'/);
+ assert.match(file,/phase\('GITHUB_COLLECTION'/);
+ assert.match(file,/phase\('ENCRYPTED_STAGING'/);
+ assert.match(file,/if\(typed!=='ACTIVATE'\)return \{mode:'CANCELLED'/);
+ assert.doesNotMatch(file,/console\.error\('PC-04G refused safely: '\+error\.message/);
 });
