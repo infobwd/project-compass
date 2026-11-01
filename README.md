@@ -175,3 +175,13 @@ After PC-04B dummy `--input-check` was reported PASS by the owner, this phase co
 - Eight fictional-only regression tests for unauthenticated 401, detail 403, logout 401, scope mismatch, hostile origin and no public React import.
 - Full guide: [PC-04C owner-private Dashboard acceptance](docs/PC04C_PRIVATE_WORKPLAN_DASHBOARD_RUNBOOK.md).
 - **Draft only; Windows exact-HEAD QA and any actual private TODO save remain separately unverified. No Merge, Deploy or private Pages content.**
+
+
+### PC-04D — private evidence-first morning brief (Draft, no schedule)
+After owner-reported PC-04C responsive visual acceptance, PC-04D introduces a **manual terminal-only read-only morning brief** derived from the validated selected encrypted Git Snapshot and owner-encrypted workplan. [Private PC-04D runbook](docs/PC04D_PRIVATE_MORNING_BRIEF_RUNBOOK.md).
+
+- `node tools/private-plan/morning-brief-cli.mjs --summary` prints only nonidentifying counts, observation timestamp, freshness and Bangkok local date.
+- `--details` requires typing `DISPLAY` before showing private repository/task text **in the owner's terminal only**; never in GitHub Pages, Actions logs, browser, or automatically exported files.
+- Review prompts are marked `NOT_VERIFIED`; only owner-entered TODOs are listed as tasks. Zero recorded tasks does not mean zero real backlog; Git default HEAD is not host deployment proof.
+- Nine fictional-only tests cover data-source separation, Bangkok date boundaries, task priorities, owner evidence gating and no live GitHub/file writes.
+- No automated 07:00 scheduler was installed. Any cloud/local morning automation requires a separate approved privacy design and cannot presume access to D: encrypted files. No Merge / Deploy.
