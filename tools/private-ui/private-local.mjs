@@ -106,9 +106,13 @@ export async function startOwnerLocalServer({projection,now=()=>Date.now(),pairC
  if(!projection||projection.kind!=='PRIVATE_LOCAL_PROJECTION'||projection.boundary!=='OFFLINE_NODE_ONLY_NOT_FOR_HTTP_OR_PAGES'||
     !Array.isArray(projection.projects)||projection.projects.length!==projection.selected||
     !/^[0-9A-F]{16}$/.test(pairCode))throw Error('Invalid private projection or pairing configuration');
- let data=projection,session=null,used=false,attempts=0;
+ let data=projection,session=null,used=false,attempts=0,sessionTimer=null,pairTimer=null;
  const issueTime=now(),codeHash=hash(pairCode);
- const discard=()=>{data=null;session=null;used=true;};
+ const discard=()=>{data=null;session=null;used=true;if(sessionTimer)clearTimeout(sessionTimer);if(pairTimer)clearTimeout(pairTimer);};
+ // Unpaired plaintext cannot remain resident indefinitely. Timers are a safety fallback;
+ // mocked time is still independently checked on every real request.
+ pairTimer=setTimeout(()=>{if(!used)discard();},pairTtlMs+1000);
+ pairTimer.unref?.();
  const active=req=>{
   if(!session||!data)return false;
   const time=now();if(time-session.last>idleMs||time-session.created>absoluteMs||time<session.created){
@@ -154,6 +158,8 @@ export async function startOwnerLocalServer({projection,now=()=>Date.now(),pairC
        !timingSafeEqual(hash(body.code),codeHash))return deny(res,401);
     used=true;const token=randomBytes(32).toString('hex'),time=now();
     session={hash:hash(token),created:time,last:time,details:false};
+    if(pairTimer)clearTimeout(pairTimer);
+    sessionTimer=setTimeout(discard,absoluteMs+1000);sessionTimer.unref?.();
     return respond(res,200,JSON.stringify({paired:true}),undefined,
      {'Set-Cookie':COOKIE+'='+token+'; HttpOnly; SameSite=Strict; Path=/; Max-Age='+Math.floor(absoluteMs/1000)});
    }
