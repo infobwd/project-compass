@@ -230,3 +230,12 @@ The existing selected GitHub Snapshot is a saved observation, and the previous `
 - `--activate --stage-id ID` requires a new passphrase prompt plus explicit exact **ACTIVATE** consent. After a fresh under-lock digest/scope check, it creates a unique encrypted **backup of the previous selected Snapshot** and replaces only the active encrypted Snapshot. The separately encrypted owner workplan is not changed.
 - Eight fictional-only Node tests use disposable private temp folders and verify staging, nonwriting inspection, confirmation gate, stale/invalid data rejection, encrypted backup and preserved owner plan.
 - No new public `src/` UI, private browser POST, GitHub writes, automatic refresh/07:00 job, Merge, Deploy or PUBLIC real-data upload. Windows exact-HEAD QA remains required before the owner's first real Stage/Activate.
+
+
+### PC-04H — Complete saved PR/Issue review in private local pages (Draft)
+After owner-reported PC-04G encrypted Snapshot activation and post-activation verification, the paired owner-private dashboard can page through **all complete verified numeric PR/Issue references in the saved Snapshot**, rather than showing only two per project. It remains **NOT GitHub Live** and is never deployed to the public Pages app. See [PC-04H private owner Windows QA](docs/PC04H_PRIVATE_CANDIDATE_PAGINATION_RUNBOOK.md).
+
+- Existing pairing + explicit detail authorization required; new fixed-shape `GET /api/candidates/page/{index}/{PR|ISSUE}/{page}` returns **10 references maximum**, with no sensitive host/worktree notes or branch SHAs. Old Snapshot-only mode returns HTTP 404.
+- Incomplete/invalid numbers **fail closed**; a project with a complete enumeration shows "ดู PR/Issue ทั้งหมดจาก Snapshot" only when the short preview omits entries. Prev/Next is numerical lookup, not priority or approval.
+- An owner may select any displayed number for the existing **ephemeral, unsaved** PC-04F worksheet. No new file write, task creation, GitHub API call, 07:00 automatic refresh, Merge, Deploy or real private data in public Pages.
+- Eight fictional-only tests. Exact Windows regression, Build/Public Scan, 401/403 and Logout QA **PENDING**; PC-04G local acceptance is OWNER-REPORTED, not independently host-verified.
