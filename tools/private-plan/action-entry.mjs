@@ -67,13 +67,26 @@ async function projectIndex(plan){
  }
  return validateProjectIndex(selected,plan.projects.length);
 }
+// The input check uses *fictional typed samples* only, never a real passphrase.
+// Distinguish empty/incorrect samples from broken TTY safely; do not echo masked contents.
+export function validateDiagnosticSample(sample,{masked=false}={}){
+ const value=String(sample??'').trim();
+ const label=masked?'MASKED':'VISIBLE';
+ if(value.length===0)throw Error('PC04B_INPUT_CHECK_'+label+'_EMPTY');
+ if(value.toUpperCase()!=='TEST')throw Error('PC04B_INPUT_CHECK_'+label+'_MISMATCH');
+ return true;
+}
 export async function runOwnerActionEntry(args=process.argv.slice(2),env=process.env){
  if(args.length===1&&args[0]==='--input-check'){
-  const secret=await readTerminalLine('Test masked input — type TEST then Enter: ',{secret:true,max:16});
-  if(secret!=='TEST')throw Error('PC04B_INPUT_CHECK_SECRET_FAILED');
-  const number=await ownerInput('Test project index — type 1 then Enter: ',3);
+  process.stdout.write('SAFE INPUT TEST ONLY — DO NOT ENTER YOUR ACTUAL PASSPHRASE.\\n');
+  const visible=await ownerInput('Step 1/3: type TEST (visible) then Enter: ',16);
+  validateDiagnosticSample(visible);
+  const secret=await readTerminalLine('Step 2/3: type TEST again (hidden) then Enter: ',{secret:true,max:16});
+  validateDiagnosticSample(secret,{masked:true});
+  const number=await ownerInput('Step 3/3: type 1 (visible) then Enter: ',3);
   if(validateProjectIndex(number,11)!==1)throw Error('PC04B_INPUT_CHECK_INDEX_FAILED');
-  return {inputCheck:'PASS',writes:false,privateDataAccessed:false};
+  return {inputCheck:'PASS',visibleInput:'PASS',maskedInput:'PASS',indexInput:'PASS',
+   writes:false,privateDataAccessed:false};
  }
  if(args.length!==1||args[0]!=='--add-action')throw Error('Usage: node tools/private-plan/action-entry.mjs --input-check | --add-action');
  if(!process.stdin.isTTY||!env.BWD_COMPASS_PRIVATE_DIR)throw Error('PC04B_TTY_REQUIRED');
@@ -124,7 +137,9 @@ if(main)runOwnerActionEntry().then(r=>{
  const safe=new Set(['PC04B_TTY_REQUIRED','PC04B_INPUT_CLOSED','PC04B_INPUT_UNAVAILABLE',
   'PC04B_INPUT_CANCELLED','PC04B_INVALID_PROJECT_INDEX','PC04B_INVALID_ACTION_TITLE',
   'PC04B_INVALID_PRIORITY','PC04B_INVALID_RESPONSIBLE','PC04B_INVALID_DUE_DATE',
-  'PC04B_INPUT_CHECK_SECRET_FAILED','PC04B_INPUT_CHECK_INDEX_FAILED']);
+  'PC04B_INPUT_CHECK_VISIBLE_EMPTY','PC04B_INPUT_CHECK_VISIBLE_MISMATCH',
+  'PC04B_INPUT_CHECK_MASKED_EMPTY','PC04B_INPUT_CHECK_MASKED_MISMATCH',
+  'PC04B_INPUT_CHECK_INDEX_FAILED']);
  const code=safe.has(error?.message)?error.message:'PC04B_PRIVATE_OPERATION_FAILED';
  console.error('PC-04B private action NOT committed. Code: '+code);
  console.error('No private value printed. Check the encrypted plan with --summary.');
