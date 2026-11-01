@@ -32,7 +32,13 @@ The owner explicitly chose to accept the known/possible residual risk that earli
 
 **Security status:** `M1 = RISK_ACCEPTED_BY_OWNER / EXPOSURE_NOT_REMEDIATED`. M2–M5 all remain `PENDING/HOLD`. No blanket authorization for actual private Snapshot browser use, production release, Merge, Deploy, real TODO writes, or disclosure of additional sensitive data. If credentials, access tokens, learner identifiers, or other high-impact secrets are found later, treat them as a *new incident requiring separate review and appropriate rotation/containment*, not covered by this acceptance. No personally identifying paths or raw history excerpts are reproduced in the public repository.
 
-## Human gate register — source checklist (current M1 decision above)
+## Owner-observed M2 synthetic HTTP gate — 2026-11-01
+
+**Status: M2_SYNTHETIC_OWNER_OBSERVED_PASS (NOT REAL-PRIVATE SECURITY ACCEPTANCE).** Owner reported that the local synthetic-only Chrome pairing flow followed the expected sequence: before pairing protected endpoint **401**; after pairing before separate detail approval **403**; after deliberate detail approval **200**; after logout protected endpoint **401**. Earlier owner screenshot demonstrated the synthetic session's `details 200`, `projects 200`, `logout 204`, and LOCKED UI; later owner found that DevTools had an active Fetch/XHR filter, obscuring some requests, and then confirmed the expected HTTP status observations. This is the owner's report, **not independent collection of HTTP traffic**. Refresh/cache persistence is not independently proven by a complete browser trace and remains part of subsequent browser threat review. No actual encrypted Snapshot or real private browser was needed for this M2 synthetic test.
+
+**Scope boundary:** source-observed logout invalidation and this synthetic-only result do not automatically approve actual private browser use, real-cookie/session handling, hostile local processes, remote exposure, or Host deployment. **M3, M4, M5 = OPEN/HOLD** pending separate decisions. No automatic Merge/Deploy, data export, or real TODO.
+
+## Human gate register — source checklist (owner decisions above)
 
 | Gate | Evidence owner must supply | STOP / HOLD rule |
 |---|---|---|
@@ -75,7 +81,7 @@ Use a private-only worksheet to record: reviewed machine, tested exact HEAD, obs
 ## Release restriction / rollback
 
 - No automatic Merge, Deploy, encrypted Workplan write, live Stage refresh, repository migration, remote secret export, Git history rewrite or browser launch.
-- This PC-04M PR is **docs-only** and stacked on PC-04L; M1 owner residual risk acceptance is **not** technical security verification, and M2–M5 remain unresolved.
+- This PC-04M PR is **docs-only** and stacked on PC-04L; M1 owner residual risk acceptance is **not** technical security verification; M2 is owner-observed synthetic HTTP acceptance only, and M3–M5 remain unresolved.
 - Stop any owner-local private session when finished and close with Ctrl+C. If a real disclosure is suspected, suspend release, preserve evidence privately and decide remediation separately before continuing.
 
-**Current owner decision:** PC-04L owner-local automated acceptance PASS; PC-04M M1 historic-public-source risk is **ACCEPTED BY OWNER, NOT REMEDIATED**. M2–M5 remain OPEN. Next owner action is **M2 synthetic-only Logout/Refresh/HTTP 401 inspection**. Real-private browser use still requires a separate explicit authorization under M3.
+**Current owner decision:** PC-04L owner-local automated acceptance PASS; PC-04M M1 historical-public-source risk is **ACCEPTED BY OWNER, NOT REMEDIATED**, and M2 **SYNTHETIC OWNER-OBSERVED PASS** for the 401 → 403 → 200 → 401 sequence. M3–M5 remain OPEN; separate browser/cache/Refresh and threat-model evidence is not automatically satisfied. Next safe action: M4 source-level threat review without unlocking any actual private data; M3 owner authorization remains required before real-private browser acceptance.
