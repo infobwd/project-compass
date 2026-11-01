@@ -1,0 +1,52 @@
+name: Publish PUBLIC DEMO to GitHub Pages (manual approval only)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: public-pages-manual-release
+  cancel-in-progress: false
+
+jobs:
+  build:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout public main
+        uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install public-only dependencies
+        run: npm install --no-audit --no-fund
+      - name: Reject private references in source
+        run: npm run check:public-source
+      - name: Test fictional UI contract
+        run: npm test
+      - name: Build static site
+        run: npm run build
+      - name: Reject sensitive public build output
+        run: npm run check:public-dist
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+      - name: Upload only built dist (never repository tree)
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: ./dist
+  deploy:
+    if: github.ref == 'refs/heads/main'
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy after OWNER manually ran workflow
+        id: deployment
+        uses: actions/deploy-pages@v4

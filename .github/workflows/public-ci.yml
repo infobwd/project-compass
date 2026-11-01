@@ -1,0 +1,30 @@
+name: Public Demo CI (no deployment)
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  public-safe-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout public source
+        uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install public frontend dependencies
+        run: npm install --no-audit --no-fund
+      - name: Public-only source audit
+        run: npm run check:public-source
+      - name: Public fixture tests
+        run: npm test
+      - name: Build Vite static site
+        run: npm run build
+      - name: Scan publishable output
+        run: npm run check:public-dist

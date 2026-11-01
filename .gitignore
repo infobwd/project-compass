@@ -1,0 +1,18 @@
+# Build outputs — never commit local dist or dependencies
+node_modules/
+dist/
+*.tsbuildinfo
+.vite/
+coverage/
+*.log
+
+# Private data and credentials — NEVER publish
+.env
+.env.*
+!.env.example
+*.snapshot.enc.json
+projects.selection.json
+PRIVATE_*.json
+PRIVATE_*.md
+*.key
+*.pem
