@@ -141,7 +141,13 @@ test('PC04A PUBLIC Pages never import the private workplan; owner-local explicit
  assert.doesNotMatch(source,/workplan-model|encrypted-workplan|owner-workplan\.enc\.json|PRIVATE_LOCAL_WORKPLAN/);
  assert.match(local,/--ack-private-workplan-local/);
  assert.match(local,/readPrivateWorkplanFile/);
- assert.doesNotMatch(local,/workplan-revision\.mjs|action-entry\.mjs/);
+ // The private page may DISPLAY a manual CLI instruction; text is not an import.
+ // Disallow real static/dynamic module imports and server-side task revisions.
+ const serverImportLines=local.split('\n').filter(line=>/^\s*import\s/.test(line));
+ assert.doesNotMatch(serverImportLines.join('\n'),/workplan-revision\.mjs|action-entry\.mjs/);
+ assert.doesNotMatch(local,/\bimport\s*\(\s*['"][^'"]*(?:workplan-revision|action-entry)\.mjs/);
+ assert.match(local,/if\(method==='POST'&&\['\/session','\/session\/details','\/session\/logout'\]\.includes\(path\)\)/);
+ assert.doesNotMatch(local,/commitOwnerRevision\s*\(|createOwnerAction\s*\(/);
 });
 
 test('PC04A CLI preflight reports only existence, never private project names',async()=>{
