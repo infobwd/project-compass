@@ -156,3 +156,12 @@ The public demo was published through a manually dispatched GitHub Pages workflo
 - `tools/private-plan/workplan-cli.mjs --check|--init|--summary` is an explicit local PowerShell workflow; no connection to the public React UI or live GitHub host state.
 - The first-run workplan has UNKNOWN development, NOT_VERIFIED deployment and NEEDS_REVIEW decisions for every selected repo; actual actions are never invented from Git HEAD/PR count.
 - PC-04B (owner-editing), PC-04C (local Dashboard overlay), PC-04D (morning evidence brief) are separate future gates. **No Merge, Deploy, auto-status promotion or public disclosure.**
+
+
+### PC-04B — Owner-confirmed next action entry + encrypted revision (Draft)
+The owner confirmed PC-04A `--check → --init → --summary` succeeded for an **existing** 11-project private workplan on Windows; do **not** run `--init` again. [PC-04B private action/revision runbook](docs/PC04B_OWNER_ACTION_REVISION_RUNBOOK.md).
+
+- `tools/private-plan/action-entry.mjs --add-action`: explicitly owner-entered `TODO` only, with selected project index, priority, responsible party, due date, next step and reason; **no write until user types CONFIRM**.
+- `tools/private-plan/workplan-revision.mjs`: AES-GCM/scrypt encrypted backup before replacement, exclusive lock and SHA-256 stale file check, no silent overwrite. Real Windows file-system QA is required before acceptance.
+- Six fictional-only regression tests. No automatic `DONE`, development acceptance, host verification, GitHub write or public Pages data.
+- Local/private release only, on a stacked Draft PR separate from public `main`. No Merge or Deploy.
