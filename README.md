@@ -178,6 +178,8 @@ After PC-04B dummy `--input-check` was reported PASS by the owner, this phase co
 
 
 ### PC-04D — private evidence-first morning brief (Draft, no schedule)
+- **PC-04D1 readability update:** `--compact` shows a concise Thai owner-only report (still requires passphrase and typed `DISPLAY`), instead of repeating long five-axis technical flags for each project. `--summary` remains nonidentifying counts and `--details` remains the full private audit view. See PC-04D runbook for test instructions and privacy restrictions.
+
 After owner-reported PC-04C responsive visual acceptance, PC-04D introduces a **manual terminal-only read-only morning brief** derived from the validated selected encrypted Git Snapshot and owner-encrypted workplan. [Private PC-04D runbook](docs/PC04D_PRIVATE_MORNING_BRIEF_RUNBOOK.md).
 
 - `node tools/private-plan/morning-brief-cli.mjs --summary` prints only nonidentifying counts, observation timestamp, freshness and Bangkok local date.
