@@ -189,3 +189,15 @@ After owner-reported PC-04C responsive visual acceptance, PC-04D introduces a **
 - Review prompts are marked `NOT_VERIFIED`; only owner-entered TODOs are listed as tasks. Zero recorded tasks does not mean zero real backlog; Git default HEAD is not host deployment proof.
 - Nine fictional-only tests cover data-source separation, Bangkok date boundaries, task priorities, owner evidence gating and no live GitHub/file writes.
 - No automated 07:00 scheduler was installed. Any cloud/local morning automation requires a separate approved privacy design and cannot presume access to D: encrypted files. No Merge / Deploy.
+
+
+### PC-04D2 — Thai Morning Brief in private local browser (Draft)
+Owner prefers a readable Thai summary in the **127.0.0.1 paired local dashboard** rather than diagnosing Thai glyph rendering in PowerShell. This is the explicitly authorized **PRIVATE workplan** viewer only, not the public Pages site.
+
+- `--ack-private-workplan-local` continues to load the validated encrypted selected Snapshot and owner workplan only on the user's trusted Windows machine, in memory.
+- After pairing: `/api/morning/summary` returns nonidentifying owner-recorded TODO counts, Bangkok date and saved Git freshness; unpaired requests get HTTP 401.
+- After the existing detail step-up: `/api/morning/details` returns minimized owner-entered tasks and separate clearly marked **unverified review prompts**; before step-up returns HTTP 403.
+- Thai text is rendered in the local UTF-8 browser DOM; no exports, internet access, task mutation, owner approval promotion or external fonts. Logout revokes the morning routes.
+- Snapshot-only mode does not load the morning brief; public GitHub Pages remains fictional DEMO data.
+- Eight synthetic-only HTTP/security regression tests; owner Windows QA and actual Thai browser rendering still **NOT VERIFIED**.
+- [PC-04D2 private web morning runbook](docs/PC04D2_PRIVATE_WEB_MORNING_QA_20261101.md). **No Merge / Deploy / 07:00 scheduling.**
