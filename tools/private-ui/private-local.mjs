@@ -152,7 +152,7 @@ function renderCandidateSummary(d){
  el('candidates').hidden=false;
 }
 // PC-04F: browser-only review worksheet, never a saved TODO or a claim of current GitHub state.
-function renderReviewWorksheet(project,index,item,rootId='review-worksheet',changeContext=''){
+function renderReviewWorksheet(project,index,item,rootId='review-worksheet',changeContext='',deltaChange=''){
  const root=el(rootId);root.replaceChildren();
  if(!Number.isInteger(item.number)||item.number<1)throw Error('Invalid reference');
  const kind=item.kind==='REVIEW_OPEN_PR_AT_SNAPSHOT'?'PR':'Issue';
@@ -161,6 +161,13 @@ function renderReviewWorksheet(project,index,item,rootId='review-worksheet',chan
  root.append(element('p','โครงการ '+project.repository+' · ลำดับโครงการในทะเบียน '+(index+1),'note'));
  root.append(element('p','อ้างอิงจาก Snapshot ที่บันทึกไว้ อาจไม่ใช่สถานะ GitHub ล่าสุด และยังไม่ได้จัดลำดับความสำคัญ','note'));
  if(changeContext)root.append(element('p',changeContext+' — เป็นความเปลี่ยนแปลงของรายการเปิด ไม่ใช่หลักฐานว่า Merge หรือปิดงาน','note'));
+ if(deltaChange){
+  const cmd='node tools/private-plan/delta-action-cli.mjs --review-only --stage-id $stageId --project-index '+
+   (index+1)+' --kind '+kind.toUpperCase()+' --change '+deltaChange+' --number '+item.number;
+  root.append(element('p','PC-04K หากต้องการตรวจสถานะ GitHub ล่าสุดแบบไม่บันทึก: เปิด PowerShell ส่วนตัว ตั้งค่า $stageId เป็น Stage ID ที่ Activate แล้ว จากนั้นใช้คำสั่งนี้','note'));
+  root.append(element('p',cmd,'note'));
+  root.append(element('p','การตรวจแบบนี้ไม่เพิ่ม TODO หากต้องการรับงานจริง ให้เจ้าของใช้ --add-action แทน --review-only และยืนยัน REVIEWED กับ CONFIRM แยกกัน','note'));
+ }
  const checks=[
   'เปิด '+kind+' #'+item.number+' ที่ GitHub และตรวจสถานะล่าสุดก่อน',
   'ตรวจฐาน Branch / PR ที่เป็นเงื่อนไขและผลทดสอบล่าสุด',
@@ -309,7 +316,7 @@ function openDeltaReviewPage(project,index,kind,change){
     button.addEventListener('click',()=>renderReviewWorksheet(
      {repository:project.repository},index,{
       number:row.number,kind:kind==='PR'?'REVIEW_OPEN_PR_AT_SNAPSHOT':'REVIEW_OPEN_ISSUE_AT_SNAPSHOT'
-     },'delta-review-worksheet',changeLabel));
+     },'delta-review-worksheet',changeLabel,change));
     entry.append(button);host.append(entry);
    }
    const nav=element('div','','row');
