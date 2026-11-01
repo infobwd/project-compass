@@ -82,6 +82,16 @@ Manual browser checklist (keep screenshot and DevTools inspection on trusted PC;
 
 Failure or uncertainty => `HOLD`, never `PASS` by inference.
 
+## M4 owner decision and M3 authorization boundary — 2026-11-01
+
+Owner explicitly accepts M4 *residual operational risk* under a trusted personal Windows workstation, trusted browser without unnecessary extensions, no screen-sharing or unintended recordings, encrypted private folder outside Git, passphrase/code protection in terminal, and Logout followed by Ctrl+C to close the local server. Full details in the [M4 Threat Model](PC04M_M4_LOCAL_BROWSER_THREAT_MODEL.md).
+
+Record `M4=SOURCE_REVIEW_COMPLETE / OWNER_CONDITIONAL_RISK_ACCEPTANCE`. This is **not** proof of hostile local process resistance, browser BFCache/Refresh correctness, private UI acceptance, or Host readiness.
+
+**M3 stays OPEN: no permission to launch/use the actual encrypted Snapshot in the browser has been granted by the M4 risk acceptance.** For a separate M3 decision, first identify a trusted Windows device/browser profile, confirm no external sharing, require a fresh explicit owner **YES** specifically for the local private read-only browser use, and only then follow PC-04I/PC-04J owner-local runbook. Keep real Stage ID, passphrase, cookies, response bodies, paths and identities out of public docs/chat. Never run real-private browser on the owner's behalf without their separate instruction.
+
+M5 remains OPEN: after M3 approval, use a minimal, private-only acceptance worksheet to check 401 before pairing; 403 before details opt-in; 200 after; Logout 204; 401 for previously protected API after Logout and locked on Refresh; no private fields or tokens in published assets/Network screenshots; no HTTP writer/Host claims. If any status unexpectedly differs, STOP and retain local evidence only.
+
 ### C. M3–M5: explicit human decisions after the first two gates
 
 Use a private-only worksheet to record: reviewed machine, tested exact HEAD, observed local HTTP statuses, residual threat risks, owner decision and date, and confirmation that no private registry content was exported. Publish only **redacted PASS / HOLD / UNKNOWN** and evidence category in the public Draft PR. Do not elevate source-check PASS to Host or real-data acceptance.
@@ -92,4 +102,4 @@ Use a private-only worksheet to record: reviewed machine, tested exact HEAD, obs
 - This PC-04M PR is **docs-only** and stacked on PC-04L; M1 owner residual risk acceptance is **not** technical security verification; M2 is owner-observed synthetic HTTP acceptance only, and M3–M5 remain unresolved.
 - Stop any owner-local private session when finished and close with Ctrl+C. If a real disclosure is suspected, suspend release, preserve evidence privately and decide remediation separately before continuing.
 
-**Current owner decision:** PC-04L owner-local automated acceptance PASS; PC-04M M1 historical-public-source risk is **ACCEPTED BY OWNER, NOT REMEDIATED**, and M2 **SYNTHETIC OWNER-OBSERVED PASS** for the 401 → 403 → 200 → 401 sequence. M3–M5 remain OPEN; separate browser/cache/Refresh and threat-model evidence is not automatically satisfied. M4 source review is now complete, but owner acceptance of local-device/browser residual risk remains pending. M3 owner authorization remains required before real-private browser acceptance.
+**Current owner decision:** PC-04L owner-local automated acceptance PASS; PC-04M M1 historical-public-source risk is **ACCEPTED BY OWNER, NOT REMEDIATED**, and M2 **SYNTHETIC OWNER-OBSERVED PASS** for the 401 → 403 → 200 → 401 sequence. M3–M5 remain OPEN; separate browser/cache/Refresh and threat-model evidence is not automatically satisfied. M4 source review is complete and its residual operational risk has been conditionally accepted by the owner under the trusted-device/browser controls. This remains risk acceptance rather than an independent security PASS. M3 explicit actual-private-browser consent and M5 acceptance remain OPEN; browser Refresh/BFCache and Windows local-process/ACL behavior have not been technically certified.
