@@ -94,6 +94,7 @@ function stageRead(folder,id){
 export function preflightEncryptedRefresh({folder,passphrase}){
  const directory=safeDirectory(folder),sel=selected(directory);
  const old=activeSnapshot(directory,passphrase,sel.names);
+ fail(old.value.owner===sel.owner,'EXISTING_OWNER_SCOPE');
  validateOwnerPlan(old.value,directory,passphrase,sel.names);
  return {owner:sel.owner,selectedRepositories:[...sel.names],selected:sel.names.length,
   mode:'PC04G_PREFLIGHT_NO_WRITES',oldPreserved:true};
@@ -116,6 +117,7 @@ export function stageEncryptedRefresh({folder,passphrase,candidate,clock=Date.no
 export function inspectEncryptedRefresh({folder,passphrase,id,clock=Date.now()}){
  const directory=safeDirectory(folder),sel=selected(directory);
  const old=activeSnapshot(directory,passphrase,sel.names);
+ fail(old.value.owner===sel.owner,'EXISTING_OWNER_SCOPE');
  const s=stageRead(directory,id);
  fail(s.record.oldDigest===old.digest&&s.record.selectionDigest===sel.digest,'STALE_BASE_OR_SELECTION');
  const candidate=decryptSnapshot(s.record.encryptedSnapshot,passphrase);
