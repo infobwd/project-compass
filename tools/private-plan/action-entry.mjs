@@ -78,7 +78,7 @@ export function validateDiagnosticSample(sample,{masked=false}={}){
 }
 export async function runOwnerActionEntry(args=process.argv.slice(2),env=process.env){
  if(args.length===1&&args[0]==='--input-check'){
-  process.stdout.write('SAFE INPUT TEST ONLY — DO NOT ENTER YOUR ACTUAL PASSPHRASE.\\n');
+  process.stdout.write('SAFE INPUT TEST ONLY — DO NOT ENTER YOUR ACTUAL PASSPHRASE.\n');
   const visible=await ownerInput('Step 1/3: type TEST (visible) then Enter: ',16);
   validateDiagnosticSample(visible);
   const secret=await readTerminalLine('Step 2/3: type TEST again (hidden) then Enter: ',{secret:true,max:16});
