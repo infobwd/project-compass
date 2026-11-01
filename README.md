@@ -220,3 +220,13 @@ After the owner screenshot demonstrated PC-04E candidate grouping and Thai label
 - Checkboxes and selection are **ephemeral DOM-only**, cleared when closed/changed/logout; **not a signed owner review, not a saved task, not a DONE marker**.
 - If a real next action is warranted, the owner must separately invoke the encrypted terminal `action-entry.mjs --add-action` and explicitly enter `CONFIRM` for backup+revision. No automatic conversion.
 - Adds 5 fictional-only local security/UX tests. Windows exact-head acceptance pending; no `src/` changes, no merge/deploy or real data on public GitHub Pages.
+
+
+### PC-04G — Staged encrypted Snapshot refresh with explicit owner activation (Draft)
+The existing selected GitHub Snapshot is a saved observation, and the previous `sync.mjs --collect --selected` flow may directly replace the active encrypted file. **Do not rerun that older command against the owner's existing selected Snapshot.** [PC-04G private Windows runbook](docs/PC04G_SAFE_SNAPSHOT_REFRESH_RUNBOOK.md).
+
+- New owner-local CLI: `tools/private-sync/staged-refresh-cli.mjs --stage` uses GitHub **read-only GET** to collect selected metadata, validates exact owner/workplan scope and complete PR/Issue enumeration, and stores only a **new AES-GCM encrypted stage** outside Git. Active Snapshot remains unchanged.
+- `--inspect --stage-id ID` prints nonidentifying old/new counts and dates; no writes.
+- `--activate --stage-id ID` requires a new passphrase prompt plus explicit exact **ACTIVATE** consent. After a fresh under-lock digest/scope check, it creates a unique encrypted **backup of the previous selected Snapshot** and replaces only the active encrypted Snapshot. The separately encrypted owner workplan is not changed.
+- Eight fictional-only Node tests use disposable private temp folders and verify staging, nonwriting inspection, confirmation gate, stale/invalid data rejection, encrypted backup and preserved owner plan.
+- No new public `src/` UI, private browser POST, GitHub writes, automatic refresh/07:00 job, Merge, Deploy or PUBLIC real-data upload. Windows exact-HEAD QA remains required before the owner's first real Stage/Activate.
