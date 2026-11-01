@@ -201,3 +201,13 @@ Owner prefers a readable Thai summary in the **127.0.0.1 paired local dashboard*
 - Snapshot-only mode does not load the morning brief; public GitHub Pages remains fictional DEMO data.
 - Eight synthetic-only HTTP/security regression tests; owner Windows QA and actual Thai browser rendering still **NOT VERIFIED**.
 - [PC-04D2 private web morning runbook](docs/PC04D2_PRIVATE_WEB_MORNING_QA_20261101.md). **No Merge / Deploy / 07:00 scheduling.**
+
+
+### PC-04E — Evidence-backed PR/Issue review proposals (Draft)
+After owner-reported PC-04D2 Local Acceptance, this phase shows **suggested reviews only** for PR/Issue numbers that are **fully enumerated in the saved encrypted selected Git Snapshot**. It is not a live GitHub feed and does **not** auto-create TODOs or assign priorities. [PC-04E owner-private runbook](docs/PC04E_EVIDENCE_REVIEW_CANDIDATES_RUNBOOK.md).
+
+- Paired owner-local `/api/candidates/summary`: nonidentifying totals only; unpaired 401.
+- After the existing detail step-up, `/api/candidates/details`: minimized PR #/Issue # review candidates grouped in collapsed project cards, with missing-evidence warnings; paired without step-up 403.
+- Only verified, complete selected collections produce candidates. Incomplete collections generate **no fabricated references**, and the view never implies tasks are complete or ready for Merge/Deploy.
+- Proposals are `NOT_ASSESSED`, `ownerConfirmed:false` and `ownerTasksAdded:0`. The separately encrypted owner workplan is not modified; an owner must inspect PR/Issue state and independently use the existing `--add-action` / `CONFIRM` flow.
+- Adds 15 fictional-only regression tests. Windows exact-HEAD acceptance required; no public `src/` code, GitHub Pages data, autonomous snapshot refresh or 07:00 schedule change. No Merge / Deploy.
