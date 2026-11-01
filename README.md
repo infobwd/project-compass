@@ -146,3 +146,13 @@ The actual runtime/test branch is **not yet Windows-accepted**; do not confuse o
 
 ### PC-03D3B-4 — owner-local UX clarity and security regression (Draft)
 Following an owner screenshot showing **94/94 Node tests and Vite build PASS** on the prior real-local pilot, D3B-4 improves the private detail-button state/ARIA and Bangkok observation-time labels. Five **fictional-only** regression tests cover pairing exhaustion, expiry, logout and locked static responses. [Runbook and acceptance gates](docs/PC03D3B4_PRIVATE_LOCAL_UX_REGRESSION.md). The prior screenshot did not show the final public-dist scan result or actual Windows HEAD, so those are still unverified. No merge, deploy, LAN exposure or public private data.
+
+
+### PC-04A — Private owner workplan (not in Pages)
+The public demo was published through a manually dispatched GitHub Pages workflow on `main`. PC-04A begins the private operational layer: a validated, owner-maintained project/action/decision workplan with **no assumed completions**. See [PC-04A private workplan and D-drive runbook](docs/PC04A_PRIVATE_WORKPLAN_RUNBOOK.md).
+
+- Pure `tools/private-plan/workplan-model.mjs` derives only explicit owner-reviewed statuses and evidence-gated actions from the selected private registry scope.
+- `tools/private-plan/encrypted-workplan.mjs` stores an independently encrypted `owner-workplan.enc.json` **outside Git**, create-only, no plaintext outputs or silent overwrites.
+- `tools/private-plan/workplan-cli.mjs --check|--init|--summary` is an explicit local PowerShell workflow; no connection to the public React UI or live GitHub host state.
+- The first-run workplan has UNKNOWN development, NOT_VERIFIED deployment and NEEDS_REVIEW decisions for every selected repo; actual actions are never invented from Git HEAD/PR count.
+- PC-04B (owner-editing), PC-04C (local Dashboard overlay), PC-04D (morning evidence brief) are separate future gates. **No Merge, Deploy, auto-status promotion or public disclosure.**
