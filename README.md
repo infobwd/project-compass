@@ -211,3 +211,12 @@ After owner-reported PC-04D2 Local Acceptance, this phase shows **suggested revi
 - Only verified, complete selected collections produce candidates. Incomplete collections generate **no fabricated references**, and the view never implies tasks are complete or ready for Merge/Deploy.
 - Proposals are `NOT_ASSESSED`, `ownerConfirmed:false` and `ownerTasksAdded:0`. The separately encrypted owner workplan is not modified; an owner must inspect PR/Issue state and independently use the existing `--add-action` / `CONFIRM` flow.
 - Adds 15 fictional-only regression tests. Windows exact-HEAD acceptance required; no public `src/` code, GitHub Pages data, autonomous snapshot refresh or 07:00 schedule change. No Merge / Deploy.
+
+
+### PC-04F — Unsaved Owner Review Worksheet (Draft)
+After the owner screenshot demonstrated PC-04E candidate grouping and Thai labels, the protected owner-local browser now lets the owner select **one already authorized PR/Issue candidate** for a temporary evidence checklist (current GitHub state, branch/test dependencies, Host proof, owner next-action decision). [PC-04F manual Windows runbook](docs/PC04F_OWNER_REVIEW_WORKSHEET_RUNBOOK.md).
+
+- This worksheet appears only after existing Pairing + Detail authorization; no new backend write endpoint or browser storage.
+- Checkboxes and selection are **ephemeral DOM-only**, cleared when closed/changed/logout; **not a signed owner review, not a saved task, not a DONE marker**.
+- If a real next action is warranted, the owner must separately invoke the encrypted terminal `action-entry.mjs --add-action` and explicitly enter `CONFIRM` for backup+revision. No automatic conversion.
+- Adds 5 fictional-only local security/UX tests. Windows exact-head acceptance pending; no `src/` changes, no merge/deploy or real data on public GitHub Pages.
