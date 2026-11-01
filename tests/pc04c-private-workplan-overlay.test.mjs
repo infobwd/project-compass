@@ -134,3 +134,48 @@ test('PC04C UI uses textContent-only rendering, and public Pages has no private 
  assert.doesNotMatch(privateSource,/innerHTML|localStorage|sessionStorage/);
  assert.doesNotMatch(publicSource,/workplan-model|encrypted-workplan|owner-workplan\.enc\.json|private-local\.mjs/);
 });
+
+
+test('PC04C mobile layout keeps Git evidence status full-width and separates warning from metrics grid',async()=>{
+ await withServer(async({hit})=>{
+  const css=(await hit('/style.css')).text;
+  const html=(await hit('/')).text;
+  const js=(await hit('/app.js')).text;
+  assert.match(css,/@media\(max-width:600px\)/);
+  assert.match(css,/\.axes\{grid-template-columns:1fr\}/);
+  assert.match(css,/\.row button\{width:100%\}/);
+  assert.match(html,/<div id="workplan-summary" class="grid"><\/div><p id="workplan-note" class="note"><\/p>/);
+  assert.match(js,/el\('workplan-note'\)\.textContent=foot\.textContent/);
+  assert.match(js,/el\('workplan-note'\)\.textContent=''/);
+  assert.doesNotMatch(css+html+js,/fictional-owner|PRIVATE-DO-NOT-LEAK|secret\.invalid/);
+ });
+});
+test('PC04C empty owner plan reports zero recorded tasks without implying projects are complete',async()=>{
+ const q=projection(),empty=createEmptyWorkplan(q,{at:NOW});
+ const app=await startOwnerLocalServer({projection:q,workplan:empty,pairCode:CODE});
+ const hit=(path,{method='GET',body,cookie}={})=>new Promise((resolve,reject)=>{
+  let data;const headers={Host:'127.0.0.1:'+app.port};
+  if(body!==undefined){data=JSON.stringify(body);headers.Origin='http://127.0.0.1:'+app.port;headers['Content-Type']='application/json';headers['X-BWD-Local']='1';}
+  if(cookie)headers.Cookie=cookie;
+  const req=request({host:'127.0.0.1',port:app.port,path,method,headers},res=>{
+   const chunks=[];res.on('data',b=>chunks.push(b));res.on('end',()=>resolve({status:res.statusCode,headers:res.headers,text:Buffer.concat(chunks).toString('utf8')}));
+  });req.on('error',reject);req.end(data);
+ });
+ try{
+  const pair=await hit('/session',{method:'POST',body:{code:CODE}});
+  assert.equal(pair.status,200);
+  const cookie=pair.headers['set-cookie'][0].split(';')[0];
+  const s=await hit('/api/workplan/summary',{cookie});
+  assert.equal(s.status,200);
+  const summary=JSON.parse(s.text);
+  assert.equal(summary.openActions,0);
+  assert.equal(summary.ownerReviewed,0);
+  assert.equal(summary.waitingDecision,1);
+  assert.equal((await hit('/api/workplan/actions',{cookie})).status,403);
+  assert.equal((await hit('/session/details',{method:'POST',cookie,body:{}})).status,200);
+  const actions=await hit('/api/workplan/actions',{cookie});
+  assert.equal(actions.status,200);
+  assert.equal(JSON.parse(actions.text).totalActions,0);
+  assert.deepEqual(JSON.parse(actions.text).actions,[]);
+ }finally{await new Promise(ok=>app.server.close(ok));}
+});
