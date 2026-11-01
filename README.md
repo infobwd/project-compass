@@ -132,3 +132,7 @@ D3A's five-axis fictional UI passed Local Acceptance by owner report. The next D
 
 ### PC-03D3B-1 — fictional-only hostile-origin security checks (Draft)
 Following owner-observed PC-03D3B-0 **74/74 tests**, Build, Dist Scan and 5/5 source preflight PASS, the next branch adds six [synthetic-only adversarial security tests and an explicit D0/D3B gate register](docs/PC03D3B1_SYNTHETIC_SECURITY_GATES.md). The real private browser remains **BLOCKED**. No private Snapshot access, code merge, deploy, production changes or automatic historical Git rewrite is authorized.
+
+
+### PC-03D3B-2 — synthetic browser boundary QA and private-data security decision (Draft)
+The owner reported the PC-03D3B-1 fictional authentication/logout checks PASS. D3B-2 adds six [browser boundary regression tests and an explicit real-data risk register](docs/PC03D3B2_BROWSER_BOUNDARY_RISK_REGISTER.md) without changing the synthetic HTTP server. It tests no-store/CSP/CORS, guessed private endpoints, CSRF state isolation, token disclosure, absolute expiry and server shutdown **with fictional data only**. Existing exact-head Windows test logs are still required. The real browser gate must remain `BLOCKED_FOR_REAL_PRIVATE_DATA` pending a separate risk review and explicit approval. No Merge, no Deploy and no production/private data changes.
