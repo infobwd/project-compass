@@ -25,7 +25,7 @@ The last verified private workplan view had an **empty owner task register** and
 First ensure the existing local server is stopped via Ctrl+C and preserve all local changes:
 
 ```powershell
-Set-Location 'D:\BWD-Compass\project-compass'
+Set-Location '<LOCAL_PROJECT_WORKTREE_ON_D>'
 git status --short
 git fetch origin --prune
 git switch --track origin/feat/pc04d-private-evidence-morning-brief-20261101
@@ -44,7 +44,7 @@ At the time this code was authored, the previous PC-04C baseline expected 136 te
 For the private summary:
 
 ```powershell
-$env:BWD_COMPASS_PRIVATE_DIR = 'D:\BWD-Compass-Private\private'
+$env:BWD_COMPASS_PRIVATE_DIR = '<PRIVATE_DIRECTORY_OUTSIDE_GIT>'
 node tools/private-plan/morning-brief-cli.mjs --summary
 ```
 
