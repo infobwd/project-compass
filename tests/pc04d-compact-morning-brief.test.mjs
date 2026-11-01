@@ -70,7 +70,17 @@ test('PC04D1 PRIVATE compact report is gated behind DISPLAY; --summary reveals n
  const fmt=readFileSync(fileURLToPath(new URL('../tools/private-plan/morning-brief-compact.mjs',import.meta.url)),'utf8');
  const publicSource=readFileSync(fileURLToPath(new URL('../src/App.tsx',import.meta.url)),'utf8');
  assert.match(cli,/--compact/);
- assert.ok(cli.indexOf("confirmation.trim()!=='DISPLAY'")<cli.indexOf('formatPrivateCompactBrief(brief)'));
+ // PC-04D1 now selects a formatter function, then invokes format(brief).
+ // Assert both compact variants remain strictly AFTER the consent return, not an old call spelling.
+ const consent=cli.indexOf("if(confirmation.trim()!=='DISPLAY')return {mode:'DETAILS_CANCELLED'");
+ const selection=cli.indexOf("if(args[0]==='--compact'||args[0]==='--compact-ascii')");
+ const formatSelection=cli.indexOf("const format=args[0]==='--compact'?formatPrivateCompactBrief:formatPrivateAsciiBrief");
+ const output=cli.indexOf("format(brief)");
+ assert.ok(consent>=0&&selection>consent&&formatSelection>selection&&output>formatSelection,
+  'Private compact/ASCII formatting must remain behind the explicit DISPLAY gate');
+ assert.ok(cli.indexOf("if(args[0]==='--summary')return summary")<consent,
+  'Nonidentifying --summary must return before any private details display');
+ assert.match(cli,/if\(confirmation\.trim\(\)!=='DISPLAY'\)return \{mode:'DETAILS_CANCELLED'/);
  assert.match(cli,/if\(args\[0\]==='--summary'\)return summary/);
  assert.doesNotMatch(fmt,/node:fs|node:http|fetch\(|createServer|writeFileSync|localStorage|sessionStorage/);
  assert.doesNotMatch(publicSource,/morning-brief|morning-brief-compact|owner-workplan/);
