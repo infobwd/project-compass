@@ -2,6 +2,8 @@
 
 **Scope:** Improve the owner-local read-only UI and add security regression tests with **fictional encrypted Snapshot metadata only**. **No merge, no deploy, no remote network, no real Snapshot in repo or CI.**
 
+**Acceptance update:** PC-03D3B-4 Owner Local Acceptance was reported PASS and visual/denial evidence was inspected on 2026-11-01. See [sanitized acceptance record](PC03D3B4_OWNER_LOCAL_ACCEPTANCE_20261101.md). Full independent network-status/exact-head attestation and D0 historical exposure review remain OPEN. This is a local pilot, not a public security release.
+
 ## Latest evidence
 - PR #13 (D3B-3) local Private Registry screenshot visibly confirms a paired private local view and five-axis details. **Visual display PASS only**.
 - Owner's subsequent PowerShell screenshot confirms `npm run test`: **94/94 PASS**, and `npm run build`: **PASS**.
