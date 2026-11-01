@@ -49,6 +49,32 @@ If this Branch is already present, use `git switch feat/pc04g-safe-snapshot-stag
 
 This phase adds **8 fictional-only Node tests** including encrypted backup/restore-data checks in a disposable OS temporary folder, no implicit activation, duplicate PR rejection and stale current digest refusal. Previously PC-04F added 5 to PC-04E's owner-reported 178, so the predicted total after PC-04G is **191**, but that figure is not Windows-verified. Require actual `fail 0`, Build PASS, Public Scan PASS and 5 preflight source checks PASS. The general `BLOCKED_FOR_REAL_PRIVATE_DATA` gate is still expected for PUBLIC broader release.
 
+### PC-04G Windows diagnostics after the first refused Stage (2026-11-01)
+
+Owner-supplied PowerShell evidence shows `npm run check:public-dist` PASS, five generic source-preflight PASS items, and active `gh auth status`. A successful GitHub login does not prove the encrypted existing Snapshot/workplan preflight or repository-level collection. The original `--stage` ended with a generic `PC04G_PRIVATE_REFRESH_REFUSED` **without Stage ID**; that output does **not** establish whether a stage artifact was created. The owner's attempted `--inspect --stage-id <STAGE_ID>` was rejected by **PowerShell parsing** because the angle brackets were copied literally, not by private Snapshot inspection.
+
+A new **private-preflight-only `--diagnose` mode** safely identifies the phase of failure, with fixed sanitized status codes (never the raw exception, path, repository name or passphrase). It requires the existing hidden passphrase on a trusted local Terminal, checks the existing selected encrypted Snapshot, selected scope and encrypted workplan, and makes **no network call or file write**:
+
+```powershell
+node tools/private-sync/staged-refresh-cli.mjs --diagnose
+```
+
+If `PRIVATE_PREFLIGHT_PASS`, the original failure is likely after the existing-file validation; retry `--stage` **only after the new full test suite passes**, and observe the specific phase code:
+- `PC04G_PHASE_PRIVATE_PREFLIGHT_...` — existing-file/selection/workplan validation
+- `PC04G_PHASE_GITHUB_COLLECTION_...` — authenticated read-only metadata collection
+- `PC04G_PHASE_ENCRYPTED_STAGING_...` — strict snapshot completeness/scope validation or encrypted Stage write.
+
+These codes narrow the diagnosis, but do not by themselves prove what failed. If a phase returns `UNCLASSIFIED_STOP`, stop and report only that code; never log raw exceptions or decrypted data. **Do not attempt `--activate` while `--stage` is failing.**
+
+If a successful stage returns an exact **24-character hex ID**, store it in a PowerShell variable **without angle brackets**:
+
+```powershell
+$stageId = 'paste-actual-24-character-hex-id-here'
+node tools/private-sync/staged-refresh-cli.mjs --inspect --stage-id $stageId
+```
+
+Replace the example string with the **actual ID**, e.g. `$stageId = '0123456789abcdef01234567'`. The ID is not a passphrase, but the real encrypted stage file must remain outside Git. If there is no confirmed stage ID, do not run Inspect. Never type the literal `<STAGE_ID>` in PowerShell: `<` is a reserved parsing operator. Older files remain protected; do not use legacy `sync.mjs --collect --selected` as a workaround.
+
 ### Owner manual refresh — only after local code test acceptance
 
 1. Stop old owner-private server; ensure you are on the PC-04G Branch and **make a separate offline copy of the encrypted private folder** to a trusted local backup destination before any first live activation.
