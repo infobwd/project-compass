@@ -75,8 +75,11 @@ test('PC04F user worksheet preserves explicit GitHub, branch, test, host and own
 test('PC04F completion of an on-screen checklist never creates server write routes',async()=>{
  await withServer(async({hit,plan})=>{
   const before=JSON.stringify(plan);
-  assert.equal((await hit('/api/candidates/details',{method:'POST',body:{}})).status,403);
-  assert.equal((await hit('/api/workplan/actions',{method:'POST',body:{}})).status,403);
+  const paired=await hit('/session',{method:'POST',body:{code:PAIR}});
+  assert.equal(paired.status,200);
+  const cookie=paired.headers['set-cookie'][0].split(';')[0];
+  assert.equal((await hit('/api/candidates/details',{method:'POST',body:{},cookie})).status,404);
+  assert.equal((await hit('/api/workplan/actions',{method:'POST',body:{},cookie})).status,404);
   assert.equal(plan.projects[0].actions.length,0);
   assert.equal(JSON.stringify(plan),before);
  });
