@@ -14,9 +14,9 @@ export async function runLocalMorningBrief(args=process.argv.slice(2),env=proces
  if(args.length===1&&args[0]==='--help')return {usage:'--thai-check | --summary | --compact | --compact-ascii | --details',network:false,writes:false};
  // Synthetic-only glyph diagnostic: exits before private folder/passphrase/registry access.
  if(args.length===1&&args[0]==='--thai-check'){
-  process.stdout.write('PC04D1 THAI GLYPH CHECK (fictional, no private data)\\n');
-  process.stdout.write('ทดสอบภาษาไทย: กำลังเรียนรู้ วันนี้ พรุ่งนี้ 123\\n');
-  process.stdout.write('If Thai is incomplete, check UTF-8 console code page and a Thai-capable terminal font.\\n');
+  process.stdout.write('PC04D1 THAI GLYPH CHECK (fictional, no private data)\n');
+  process.stdout.write('ทดสอบภาษาไทย: กำลังเรียนรู้ วันนี้ พรุ่งนี้ 123\n');
+  process.stdout.write('If Thai is incomplete, check UTF-8 console code page and a Thai-capable terminal font.\n');
   return {mode:'THAI_CHECK',writes:false,privateDataAccessed:false,network:false};
  }
  if(args.length!==1||!['--summary','--compact','--compact-ascii','--details'].includes(args[0]))
@@ -37,7 +37,7 @@ export async function runLocalMorningBrief(args=process.argv.slice(2),env=proces
  if(confirmation.trim()!=='DISPLAY')return {mode:'DETAILS_CANCELLED',writes:false,privateDetailsShown:false};
  if(args[0]==='--compact'||args[0]==='--compact-ascii'){
   const format=args[0]==='--compact'?formatPrivateCompactBrief:formatPrivateAsciiBrief;
-  process.stdout.write('\\n'+format(brief));
+  process.stdout.write('\n'+format(brief));
   return {mode:'DETAILS_DISPLAYED',writes:false,privateDetailsShown:true,
    compact:true,ascii:args[0]==='--compact-ascii'};
  }
