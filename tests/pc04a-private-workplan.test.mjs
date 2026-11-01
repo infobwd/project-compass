@@ -135,11 +135,13 @@ test('PC04A encrypted workplan refuses a changed selection even with correct pas
   assert.throws(()=>readPrivateWorkplanFile(mutated,pass,dir),/selection scope|order/);
  }finally{rmSync(dir,{force:true,recursive:true});}
 });
-test('PC04A public Pages and owner-local server do not import private workplan model',()=>{
+test('PC04A PUBLIC Pages never import the private workplan; owner-local explicitly opt-in only',()=>{
  const source=readSource(fileURLToPath(new URL('../src/App.tsx',import.meta.url)),'utf8');
  const local=readSource(fileURLToPath(new URL('../tools/private-ui/private-local.mjs',import.meta.url)),'utf8');
- assert.doesNotMatch(source,/workplan-model|encrypted-workplan|owner-workplan\.enc\.json/);
- assert.doesNotMatch(local,/workplan-model|encrypted-workplan|owner-workplan\.enc\.json/);
+ assert.doesNotMatch(source,/workplan-model|encrypted-workplan|owner-workplan\.enc\.json|PRIVATE_LOCAL_WORKPLAN/);
+ assert.match(local,/--ack-private-workplan-local/);
+ assert.match(local,/readPrivateWorkplanFile/);
+ assert.doesNotMatch(local,/workplan-revision\.mjs|action-entry\.mjs/);
 });
 
 test('PC04A CLI preflight reports only existence, never private project names',async()=>{
