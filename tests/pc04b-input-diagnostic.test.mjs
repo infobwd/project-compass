@@ -45,7 +45,8 @@ test('PC04B diagnostic blank input is distinguished from terminal failure withou
  const tty=new MockTTY(),out=output();
  const masked=readTerminalLine('Hidden test: ',{secret:true,input:tty,output:out});
  tty.type('\r');
- assert.throws(()=>validateDiagnosticSample(await masked,{masked:true}),/MASKED_EMPTY/);
+ const entry=await masked;
+ assert.throws(()=>validateDiagnosticSample(entry,{masked:true}),/MASKED_EMPTY/);
  assert.equal(tty.raw,false);
 });
 test('PC04B --input-check is a synthetic-only branch before private folder and snapshot load',()=>{
