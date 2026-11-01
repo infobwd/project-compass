@@ -48,6 +48,12 @@ Evidence already on record: owner-confirmed PC-04L exact-HEAD Windows 245/245 te
 5. Pair deliberately, permit per-project details only when needed, then use Logout and stop local Node server (`Ctrl+C`). On uncertainty or unexpected API 200 after logout, STOP and do not publish private data.
 6. Require a **separate M3 owner decision** before real-private browser use. Keep M5 real-data UI acceptance behind M3 and the unresolved threat/operational review. M4 source review alone must not unlock M3.
 
+## Owner residual-risk decision — M4 (2026-11-01, Asia/Bangkok)
+
+The owner **explicitly ACCEPTED M4 residual operational risk** under the previously proposed scope: run only on a personally controlled, trusted and maintained Windows workstation; use a trusted browser profile with unnecessary extensions disabled; avoid screen sharing/recording while private data is visible; retain the encrypted private directory outside Git and public web roots; keep passphrases and one-time pairing codes in the private terminal; use Logout, then stop the Node local server with Ctrl+C. This is a *conditional owner risk decision*, not a technical guarantee against malicious local processes, untrusted extensions, Windows ACL/reparse-point weaknesses, memory access or browser BFCache behavior.
+
+**M4 decision:** `SOURCE_AUDIT_COMPLETE / OWNER_ACCEPTS_RESIDUAL_RISK_WITH_CONTROLS`. The acceptance does **NOT** signify that the unobserved browser/Windows paths were independently tested or are secure. It does **NOT** grant M3 permission for real encrypted Snapshot browser access; M3 remains explicitly unapproved until separately requested. M5 real-private UI acceptance remains pending. If the trusted-device conditions change, pause private use and reassess. No Git history rewrite, Merge, Deploy or actual owner TODO was approved by this decision.
+
 ## Acceptance criteria and outstanding evidence
 
 | Milestone | Current result | Evidence needed for release |
@@ -56,10 +62,10 @@ Evidence already on record: owner-confirmed PC-04L exact-HEAD Windows 245/245 te
 | M4-B negative synthetic routes | **Existing tests present; PC-04L Windows 245/245 previously owner-observed** | Only rerun if code/behavior changes; do not infer malicious Windows process resistance |
 | M4-C Windows browser BFCache, Refresh, extensions/DevTools and cache | **NOT INDEPENDENTLY VERIFIED** | Owner-local status-only observations, no private network response bodies exported |
 | M4-D hostile same-user native process / system ACL boundary | **HIGH RESIDUAL RISK / NO ABSOLUTE SOFTWARE MITIGATION** | Owner chooses trusted-dedicated-device policy or HOLD; new evidence if threat model changes |
-| M4-E risk acceptance sign-off | **PENDING OWNER DECISION** | Explicit approval limited to trusted local private workflow; do not treat M1 acceptance as M4 acceptance |
+| M4-E risk acceptance sign-off | **OWNER ACCEPTED RESIDUAL RISK WITH OPERATING CONTROLS** | Conditional approval of M4 risk only; M3 actual-private-browser consent separately required |
 
 ### Release decision now
 
-**PC-04M M4: SOURCE AUDIT COMPLETE / HUMAN ACCEPTANCE HOLD.** M1 = accepted residual historical-path risk without deletion; M2 = owner-observed synthetic HTTP PASS; M3 = separate real-private authorization **OPEN**; M4 = owner operational risk acceptance **PENDING**; M5 = authorized real-private UI acceptance **OPEN**.
+**PC-04M M4: SOURCE AUDIT COMPLETE / RESIDUAL OPERATIONAL RISK ACCEPTED BY OWNER UNDER CONDITIONS.** M1 = accepted residual historical-path risk without deletion; M2 = owner-observed synthetic HTTP PASS; M3 = separate real-private authorization **OPEN / NOT GRANTED**; M4 = conditional owner risk acceptance **RECORDED**; M5 = authorized real-private UI acceptance **OPEN**. M4-C browser BFCache/Refresh/extension observation and M4-D Windows ACL/malicious-process limitations remain documented and are not represented as technical PASS.
 
 Do not Merge, Deploy, run live `--add-action`, rewrite Git history, open private browser with real Snapshot, publish real content, or claim the human security gate PASS from this report. If a credential, token, student identifier, or dangerous secret exposure is later discovered, stop and handle it under a separate incident review irrespective of M1 acceptance.
