@@ -30,7 +30,7 @@
 Save any local edits before switching. Inspect `git status --short`, then `git fetch origin --prune`. Do not `reset --hard`, `git clean`, Merge, Deploy or open the real encrypted Snapshot for this candidate.
 
 ```powershell
-Set-Location 'D:\BWD-Compass\project-compass'
+Set-Location '<OWNER_EXISTING_LOCAL_PROJECT_COMPASS_WORKTREE>'
 git status --short
 git fetch origin --prune
 git switch --track origin/feat/pc04o-o1o2-private-snapshot-scope-ux-20261101
