@@ -56,12 +56,12 @@ test('PC04D1 owner-recorded priority P0 and overdue are shown, never fabricated'
 test('PC04D1 compact limits task list explicitly and does not omit task-count warning',()=>{
  const {projection,plan}=fixture();
  const updated=prepareOwnerUpdate(plan,projection,NAMES[0],{
-  actions:[task('one'),task('two'),task('three')]
+  actions:[task('a-first'),task('b-second'),task('z-last')]
  },{at:EDIT});
  const b=buildPrivateMorningBrief(projection,updated,{now:'2026-11-01T08:00:00.000Z'});
  const out=formatPrivateCompactBrief(b,{maxActions:2});
  assert.match(out,/ยังมี TODO อีก 1 รายการ/);
- assert.doesNotMatch(out,/Task three/);
+ assert.doesNotMatch(out,/Task z-last/);
  assert.throws(()=>formatPrivateCompactBrief(b,{maxActions:0}),/INVALID_LIMIT/);
  assert.throws(()=>formatPrivateCompactBrief({format:'other'}),/INVALID_BRIEF/);
 });
