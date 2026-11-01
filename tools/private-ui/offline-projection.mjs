@@ -22,7 +22,14 @@ export function projectOfflineEvidence(snapshot,selectedNames,now=Date.now()){
       id:p.name,               // PRIVATE; never send to public app
       defaultBranch:p.defaultBranch, // May be legacy, NOT asserted as deployed branch
       observedAt:summary.observedAt,
-      github:{defaultHead:p.gitHead,openPRs:p.openPRs,openIssues:p.openIssues},
+      github:{defaultHead:p.gitHead,openPRs:p.openPRs,openIssues:p.openIssues,
+        // PC-04E: source-specific numeric references from the already decrypted SAVED snapshot.
+        // These are NOT live GitHub requests and are never sent to public Pages.
+        // Invalid/incomplete enumerations fail closed in the candidate model.
+        prReferences:Array.isArray(snapshot.projects.find(s=>s.fullName===p.name)?.openPRs?.items)?
+         structuredClone(snapshot.projects.find(s=>s.fullName===p.name).openPRs.items):null,
+        issueNumbers:Array.isArray(snapshot.projects.find(s=>s.fullName===p.name)?.openIssues?.numbers)?
+         [...snapshot.projects.find(s=>s.fullName===p.name).openIssues.numbers]:null},
       axes:{
         development:axis(UNKNOWN),
         git:axis(gitKnown?'OBSERVED_DEFAULT_HEAD':UNKNOWN,
