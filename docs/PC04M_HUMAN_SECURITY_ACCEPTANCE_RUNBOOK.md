@@ -38,6 +38,14 @@ The owner explicitly chose to accept the known/possible residual risk that earli
 
 **Scope boundary:** source-observed logout invalidation and this synthetic-only result do not automatically approve actual private browser use, real-cookie/session handling, hostile local processes, remote exposure, or Host deployment. **M3, M4, M5 = OPEN/HOLD** pending separate decisions. No automatic Merge/Deploy, data export, or real TODO.
 
+## PC-04M M4 — source threat review completed; owner risk decision still OPEN
+
+The [M4 source-grounded local browser threat model](PC04M_M4_LOCAL_BROWSER_THREAT_MODEL.md) inventories loopback-only listener, exact Host/Origin and Fetch Metadata checks, CSRF/session guards, cookie and timeout policy, CSP/no-store, filesystem boundaries and existing synthetic negative-test coverage. **Source-level review is complete; hostile Windows-process/browser-extension, Windows ACL/reparse-point, and Refresh/BFCache operational acceptance are not independently proved.**
+
+**Residual risk:** another malicious program or untrusted extension running under the same Windows user could still access displayed content, session/browser memory or local files. The loopback bind and cookie flags alone cannot mitigate a compromised endpoint. A dedicated trusted workstation/browser profile, no unwanted extensions/screenshare, controlled filesystem ACLs, and deliberate Logout + Ctrl+C shutdown are suggested operating controls. No real-private browser use is authorized by this document.
+
+**M4 STATUS = SOURCE_REVIEW_COMPLETE / OWNER_RISK_ACCEPTANCE_PENDING**. M1 accepted historical-path risk is narrower and does not count as M4 acceptance; M3 separate real-private consent and M5 acceptance remain OPEN. If high-impact secrets are ever found, initiate separate incident handling.
+
 ## Human gate register — source checklist (owner decisions above)
 
 | Gate | Evidence owner must supply | STOP / HOLD rule |
@@ -84,4 +92,4 @@ Use a private-only worksheet to record: reviewed machine, tested exact HEAD, obs
 - This PC-04M PR is **docs-only** and stacked on PC-04L; M1 owner residual risk acceptance is **not** technical security verification; M2 is owner-observed synthetic HTTP acceptance only, and M3–M5 remain unresolved.
 - Stop any owner-local private session when finished and close with Ctrl+C. If a real disclosure is suspected, suspend release, preserve evidence privately and decide remediation separately before continuing.
 
-**Current owner decision:** PC-04L owner-local automated acceptance PASS; PC-04M M1 historical-public-source risk is **ACCEPTED BY OWNER, NOT REMEDIATED**, and M2 **SYNTHETIC OWNER-OBSERVED PASS** for the 401 → 403 → 200 → 401 sequence. M3–M5 remain OPEN; separate browser/cache/Refresh and threat-model evidence is not automatically satisfied. Next safe action: M4 source-level threat review without unlocking any actual private data; M3 owner authorization remains required before real-private browser acceptance.
+**Current owner decision:** PC-04L owner-local automated acceptance PASS; PC-04M M1 historical-public-source risk is **ACCEPTED BY OWNER, NOT REMEDIATED**, and M2 **SYNTHETIC OWNER-OBSERVED PASS** for the 401 → 403 → 200 → 401 sequence. M3–M5 remain OPEN; separate browser/cache/Refresh and threat-model evidence is not automatically satisfied. M4 source review is now complete, but owner acceptance of local-device/browser residual risk remains pending. M3 owner authorization remains required before real-private browser acceptance.
