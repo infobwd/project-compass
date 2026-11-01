@@ -25,7 +25,14 @@ Relevant source: `tools/private-ui/private-local.mjs` on the PC-04L parent HEAD.
 
 **Do not write “SECURITY PASS” based on source inspection, tests against the synthetic server, or the public dist scan.** Static preflight intentionally reports `BLOCKED_FOR_REAL_PRIVATE_DATA`.
 
-## Human gate register — all initially OPEN
+## Owner decision recorded — M1 historical Git-path exposure
+
+**2026-11-01 Asia/Bangkok — OWNER ACCEPTS THE RESIDUAL M1 RISK (scope-limited).**
+The owner explicitly chose to accept the known/possible residual risk that earlier public Git commits or branches may still disclose historical example paths and related contextual metadata, **without authorizing destructive history rewriting**. Proceed to M2 manual acceptance work in a synthetic-only environment. This is a **risk acceptance decision**, not proof that all earlier commits were searched, that every exposed value was harmless, or that the information was deleted from Git history.
+
+**Security status:** `M1 = RISK_ACCEPTED_BY_OWNER / EXPOSURE_NOT_REMEDIATED`. M2–M5 all remain `PENDING/HOLD`. No blanket authorization for actual private Snapshot browser use, production release, Merge, Deploy, real TODO writes, or disclosure of additional sensitive data. If credentials, access tokens, learner identifiers, or other high-impact secrets are found later, treat them as a *new incident requiring separate review and appropriate rotation/containment*, not covered by this acceptance. No personally identifying paths or raw history excerpts are reproduced in the public repository.
+
+## Human gate register — source checklist (current M1 decision above)
 
 | Gate | Evidence owner must supply | STOP / HOLD rule |
 |---|---|---|
