@@ -20,6 +20,31 @@ The last verified private workplan view had an **empty owner task register** and
 - Output explicitly says `ENCRYPTED_GITHUB_SNAPSHOT_NOT_LIVE`; the freshness marker is as of the saved Snapshot, not proof of current GitHub/host status. Git default HEAD never proves deployed revision or project acceptance.
 - If no TODO is saved, the brief says **no owner-entered task recorded**, NOT “all projects complete”.
 
+## PC-04D1 concise Thai mode (owner local only)
+
+Owner-provided screenshot confirms the older `--details` displayed a local report after `DISPLAY`: no owner-entered TODO yet, and review prompts for the selected project scope. This was **OWNER-REPORTED / SCREENSHOT DETAILS PASS**, not a full new-HEAD Test or CI acceptance. The repetitive English evidence flags were difficult to scan in a narrow Windows terminal.
+
+A separate optional command now generates a shorter Thai-language checklist without changing any owner workplan records:
+
+```powershell
+node tools/private-plan/morning-brief-cli.mjs --compact
+```
+
+Enter the **existing** password into the terminal (masked). The command explicitly warns that project names and owner task details are private, and **requires the exact word `DISPLAY`** before printing them. Before `DISPLAY`, it does not print a project name or task title. Typing anything else cancels without writing.
+
+The compact output contains:
+- Report day in Asia/Bangkok, stored Git Snapshot observation timestamp, freshness, and explicit **not GitHub Live / host unverified** statement.
+- Counts of **owner-recorded** open tasks, overdue tasks, and owner-reviewed DONE; pending owner decisions and recorded host reviews.
+- Up to 8 owner-recorded priority-ranked TODOs, with a clear notice if further entries are hidden; `--details` remains the full private audit output.
+- One concise review line per project, labeled **suggested review, not an owner-recorded TODO**. It intentionally avoids repeating five technical code strings across all projects.
+- Empty task register warns that `0 TODO` does not prove there is no unfinished project work.
+
+This compact output is still **PRIVATE**. Never redirect or post the terminal report (which contains identifiers) to GitHub, Actions or a public artifact. `--summary` is the nonidentifying count-only alternative suitable for sharing **only after reviewing for incidental sensitive facts**.
+
+Four new fictional-only tests validate the empty register, Bangkok priority/due formatting, task truncation and mandatory DISPLAY gate. On the previous PC-04D code the test total was predicted at approximately 145; this change adds four tests, so **~149 is merely a forecast** until Windows output proves it.
+
+**PC-04D1 exact-HEAD Windows tests and live private compact rendering remain NOT VERIFIED**. The command adds no automation or network access.
+
 ## Exact Windows commands (owner manual steps)
 
 First ensure the existing local server is stopped via Ctrl+C and preserve all local changes:
