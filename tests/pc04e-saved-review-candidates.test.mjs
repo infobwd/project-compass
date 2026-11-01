@@ -73,9 +73,26 @@ test('PC04E owner TODO already recorded is not overwritten, duplicated or falsel
  assert.equal(r.ownerTasksAdded,0);
  assert.equal(JSON.stringify(record),before);
 });
-test('PC04E selected scope mismatch refuses proposals',()=>{
- const {p,w}=fixture(),bad=structuredClone(p);bad.projects[0].id='fictional-owner/other';
- assert.throws(()=>buildPrivateReviewCandidates(bad,w),/selected registry order mismatch/);
+test('PC04E mismatched selected projection and workplan fail closed at each validation boundary',()=>{
+ const {p,w}=fixture();
+ const originalPlan=JSON.stringify(w);
+ // Changing the selected projection causes workplan scope validation to reject it first.
+ const otherProjection=structuredClone(p);
+ otherProjection.projects[0].id='fictional-owner/other';
+ assert.throws(
+  ()=>buildPrivateReviewCandidates(otherProjection,w),
+  /Invalid private workplan: selection scope/
+ );
+ // Changing the owner plan's project identifier while preserving its selected
+ // scope reaches the separate per-project registry-order validation.
+ const otherPlan=structuredClone(w);
+ otherPlan.projects[0].repository='fictional-owner/other';
+ assert.throws(
+  ()=>buildPrivateReviewCandidates(p,otherPlan),
+  /Invalid private workplan: selected registry order mismatch/
+ );
+ assert.equal(JSON.stringify(w),originalPlan,'rejected inputs must not mutate the actual owner plan');
+ assert.equal(w.projects[0].actions.length,0,'no owner TODO can be created on refusal');
 });
 test('PC04E offline candidates never import network or public app and do not require live URLs',()=>{
  const model=readFileSync(fileURLToPath(new URL('../tools/private-plan/review-candidates.mjs',import.meta.url)),'utf8');
