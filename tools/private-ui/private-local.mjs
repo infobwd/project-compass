@@ -12,7 +12,7 @@ import { projectOfflineEvidence } from './offline-projection.mjs';
 import { readPrivateWorkplanFile } from '../private-plan/encrypted-workplan.mjs';
 import { validateWorkplan,summarizeWorkplan } from '../private-plan/workplan-model.mjs';
 import { buildPrivateMorningBrief } from '../private-plan/morning-brief.mjs';
-import { buildPrivateReviewCandidates,summarizePrivateReviewCandidates } from '../private-plan/review-candidates.mjs';
+import { buildPrivateReviewCandidates,summarizePrivateReviewCandidates,buildPrivateCandidatePage } from '../private-plan/review-candidates.mjs';
 
 const HOST='127.0.0.1', COOKIE='bwd_pc_real', MAX_BYTES=8*1024*1024;
 const HEADERS=Object.freeze({
@@ -22,7 +22,7 @@ const HEADERS=Object.freeze({
  'Cross-Origin-Resource-Policy':'same-origin','Permissions-Policy':'camera=(), microphone=(), geolocation=()'
 });
 const PAGE=`<!doctype html><html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>BWD Compass — Private Local</title><link rel="stylesheet" href="/style.css"><script defer src="/app.js"></script></head><body><div class="wrap"><header><strong>BWD Project Compass</strong><span class="tag">LOCAL · PRIVATE · READ ONLY</span></header><main><h1>Private Registry บนเครื่อง</h1><p class="notice">อ่าน Snapshot ที่ตรวจความครบถ้วนแล้ว ไม่ใช่ข้อมูล GitHub แบบ Live และไม่ยืนยัน Production</p><form id="pair"><label for="code">รหัสจับคู่ครั้งเดียวจาก PowerShell</label><input id="code" autocomplete="off" inputmode="text" maxlength="16" minlength="16" pattern="[A-Fa-f0-9]{16}" required><button type="submit">จับคู่เบราว์เซอร์</button></form><p id="status" role="status" aria-live="polite">LOCKED — ไม่แสดงข้อมูลส่วนตัว</p><section id="private" hidden><h2>สรุปหลักฐานที่บันทึกไว้</h2><div id="metrics" class="grid"></div><p id="freshness" class="note"></p><div class="row"><button id="details" type="button" aria-expanded="false" aria-controls="projects">ยืนยันและแสดงรายโครงการ</button><button id="logout" type="button" class="outline">ออกจากระบบ / ล้าง Session</button></div><section id="workplan" hidden><h2>ทะเบียนงานที่เจ้าของบันทึกไว้</h2><p class="note">ข้อมูลจากไฟล์แผนงานส่วนตัว ไม่ใช่ GitHub Live · ไม่มีการเพิ่มงานอัตโนมัติ</p><div id="workplan-summary" class="grid"></div><p id="workplan-note" class="note"></p><div id="workplan-actions" hidden></div></section><section id="morning" hidden><h2>สรุปงานวันนี้ · Morning Brief</h2><p class="note">ข้อมูลจาก Snapshot ที่บันทึกไว้และงานที่เจ้าของบันทึกจริง ไม่ใช่ GitHub Live · ไม่ยืนยันว่า Deploy หรือเสร็จแล้ว</p><div id="morning-counts" class="grid"></div><p id="morning-context" class="note"></p><div id="morning-detail" hidden></div></section><section id="candidates" hidden><h2>ข้อเสนอทบทวนจาก PR / Issue</h2><p class="note">จาก Snapshot เข้ารหัสที่บันทึกไว้ ไม่ใช่ GitHub Live · ยังไม่ใช่ TODO และไม่กำหนดความสำคัญให้อัตโนมัติ</p><div id="candidate-counts" class="grid"></div><p id="candidate-note" class="note"></p><div id="candidate-detail" hidden></div><div id="review-worksheet" class="review-worksheet" hidden></div></section><div id="projects" hidden></div></section></main><footer>Local loopback only · ไม่มีการ Merge / Deploy / GitHub Sync</footer></div></body></html>`;
-const CSS=`:root{font-family:system-ui,"Segoe UI",sans-serif;color:#142f51;background:#f3f6fb}*{box-sizing:border-box}[hidden]{display:none!important}body{margin:0}.wrap{max-width:1000px;padding:20px;margin:auto}header,.row{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap}header{padding:12px 0}.tag{background:#e2edf9;color:#134b84;font-size:11px;font-weight:800;padding:8px 12px;border-radius:40px}main{background:white;padding:clamp(20px,4vw,42px);border:1px solid #dce5f0;border-radius:24px;margin:24px 0}h1{font-size:clamp(24px,4vw,38px)}h2{font-size:20px}p{line-height:1.6}.notice,.note,footer{color:#607791;font-size:14px}form{display:grid;gap:12px;margin:22px 0}label{font-weight:700}input{min-height:48px;padding:12px;border:1px solid #90a9c8;border-radius:10px;font:inherit}button{border:0;background:#1a5188;color:white;padding:12px 17px;border-radius:11px;min-height:44px;cursor:pointer;font:inherit;font-weight:700}button.outline{background:#edf3fa;color:#1a5188}.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.metric,.project{border:1px solid #d9e4f2;background:#f7f9fd;border-radius:14px;padding:14px;min-width:0}.metric strong{display:block;font-size:23px;margin-top:8px;overflow-wrap:anywhere}.metric span{font-size:12px;color:#617b99}.row{margin:20px 0}.project{margin-top:12px}.project h3{margin:0 0 10px;overflow-wrap:anywhere}.review-item{border:1px solid #d9e4f2;background:#f7f9fd;border-radius:14px;margin-top:10px;overflow:hidden}.review-heading{display:flex;gap:12px;align-items:center;justify-content:space-between;padding:16px;cursor:pointer;min-height:48px;overflow-wrap:anywhere}.review-heading strong{font-size:16px;min-width:0;overflow-wrap:anywhere}.review-heading span{font-size:12px;color:#52708f;white-space:nowrap}.review-item[open] .review-heading{border-bottom:1px solid #d9e4f2}.review-reasons{margin:12px 18px 16px;padding-left:18px;color:#52708f;font-size:14px;line-height:1.7}.review-heading:focus-visible{outline:3px solid #d6a239;outline-offset:-3px}.candidate-entry{padding:10px 0;border-bottom:1px solid #d9e4f2}.candidate-entry p{margin:0 0 7px}.candidate-entry button{padding:9px 14px;font-size:13px;min-height:44px}.review-worksheet{margin-top:18px;border:2px solid #1c4f84;border-radius:15px;background:#f9fbfe;padding:20px}.review-check{display:flex;align-items:flex-start;gap:11px;margin:12px 0;line-height:1.5}.review-check input{width:20px;height:20px;flex-shrink:0;margin-top:2px}.review-worksheet button{margin-top:8px}.review-worksheet:focus-within{scroll-margin-top:16px}.axes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.axis{border:1px solid #dce6f2;background:white;border-radius:10px;padding:10px;overflow-wrap:anywhere}.axis b{display:block;font-size:12px;color:#52708f}.axis span{font-size:12px;font-weight:750}footer{text-align:center;margin:20px}@media(max-width:600px){.grid,.axes{grid-template-columns:repeat(2,minmax(0,1fr))}.axes{grid-template-columns:1fr}.axis span{overflow-wrap:anywhere;word-break:normal}.row button{width:100%}.wrap{padding:12px}main{border-radius:14px}.metric{min-width:0}.metric strong{font-size:22px}}@media(max-width:380px){.grid,.axes{grid-template-columns:1fr}}button:focus-visible,input:focus-visible{outline:3px solid #d6a239;outline-offset:3px}`;
+const CSS=`:root{font-family:system-ui,"Segoe UI",sans-serif;color:#142f51;background:#f3f6fb}*{box-sizing:border-box}[hidden]{display:none!important}body{margin:0}.wrap{max-width:1000px;padding:20px;margin:auto}header,.row{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap}header{padding:12px 0}.tag{background:#e2edf9;color:#134b84;font-size:11px;font-weight:800;padding:8px 12px;border-radius:40px}main{background:white;padding:clamp(20px,4vw,42px);border:1px solid #dce5f0;border-radius:24px;margin:24px 0}h1{font-size:clamp(24px,4vw,38px)}h2{font-size:20px}p{line-height:1.6}.notice,.note,footer{color:#607791;font-size:14px}form{display:grid;gap:12px;margin:22px 0}label{font-weight:700}input{min-height:48px;padding:12px;border:1px solid #90a9c8;border-radius:10px;font:inherit}button{border:0;background:#1a5188;color:white;padding:12px 17px;border-radius:11px;min-height:44px;cursor:pointer;font:inherit;font-weight:700}button.outline{background:#edf3fa;color:#1a5188}.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.metric,.project{border:1px solid #d9e4f2;background:#f7f9fd;border-radius:14px;padding:14px;min-width:0}.metric strong{display:block;font-size:23px;margin-top:8px;overflow-wrap:anywhere}.metric span{font-size:12px;color:#617b99}.row{margin:20px 0}.project{margin-top:12px}.project h3{margin:0 0 10px;overflow-wrap:anywhere}.review-item{border:1px solid #d9e4f2;background:#f7f9fd;border-radius:14px;margin-top:10px;overflow:hidden}.review-heading{display:flex;gap:12px;align-items:center;justify-content:space-between;padding:16px;cursor:pointer;min-height:48px;overflow-wrap:anywhere}.review-heading strong{font-size:16px;min-width:0;overflow-wrap:anywhere}.review-heading span{font-size:12px;color:#52708f;white-space:nowrap}.review-item[open] .review-heading{border-bottom:1px solid #d9e4f2}.review-reasons{margin:12px 18px 16px;padding-left:18px;color:#52708f;font-size:14px;line-height:1.7}.review-heading:focus-visible{outline:3px solid #d6a239;outline-offset:-3px}.candidate-entry{padding:10px 0;border-bottom:1px solid #d9e4f2}.candidate-entry p{margin:0 0 7px}.candidate-entry button{padding:9px 14px;font-size:13px;min-height:44px}.review-worksheet{margin-top:18px;border:2px solid #1c4f84;border-radius:15px;background:#f9fbfe;padding:20px}.review-check{display:flex;align-items:flex-start;gap:11px;margin:12px 0;line-height:1.5}.review-page{border:1px solid #d9e4f2;border-radius:12px;padding:12px;margin:10px 0;background:white}.review-page .row{margin:8px 0;gap:8px;flex-wrap:wrap}.review-page button{min-height:44px;padding:8px 12px}.review-page button:disabled{opacity:.5;cursor:not-allowed}.review-check input{width:20px;height:20px;flex-shrink:0;margin-top:2px}.review-worksheet button{margin-top:8px}.review-worksheet:focus-within{scroll-margin-top:16px}.axes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.axis{border:1px solid #dce6f2;background:white;border-radius:10px;padding:10px;overflow-wrap:anywhere}.axis b{display:block;font-size:12px;color:#52708f}.axis span{font-size:12px;font-weight:750}footer{text-align:center;margin:20px}@media(max-width:600px){.grid,.axes{grid-template-columns:repeat(2,minmax(0,1fr))}.axes{grid-template-columns:1fr}.axis span{overflow-wrap:anywhere;word-break:normal}.row button{width:100%}.wrap{padding:12px}main{border-radius:14px}.metric{min-width:0}.metric strong{font-size:22px}}@media(max-width:380px){.grid,.axes{grid-template-columns:1fr}}button:focus-visible,input:focus-visible{outline:3px solid #d6a239;outline-offset:3px}`;
 const JS=`(()=>{'use strict';
 const el=id=>document.getElementById(id);
 const pair=el('pair'),panel=el('private'),projects=el('projects'),status=el('status');
@@ -175,6 +175,50 @@ function renderReviewWorksheet(project,index,item){
  root.append(close);root.hidden=false;
  heading.setAttribute('tabindex','-1');heading.focus();
 }
+// PC-04H: inspect complete VERIFIED saved lists in bounded pages, never live GitHub or owner TODO.
+function openCandidatePage(project,projectIndex,kind){
+ const host=document.createElement('div');host.className='review-page';
+ const label=element('p','กำลังอ่านข้อมูล Snapshot ที่บันทึกไว้','note');
+ host.append(label);
+ let version=0;
+ async function show(page){
+  const request=++version;
+  label.textContent='กำลังอ่านรายการที่บันทึกไว้ — ไม่ใช่ GitHub Live';
+  try{
+   const d=await api('/api/candidates/page/'+projectIndex+'/'+kind+'/'+page);
+   if(!host.isConnected||panel.hidden||request!==version)return;
+   host.replaceChildren();
+   if(d.mode!=='PRIVATE_REVIEW_CANDIDATE_PAGE'||d.kind!==kind||d.projectIndex!==projectIndex)
+    throw Error('Invalid candidate page');
+   host.append(element('p',(kind==='PR'?'PR':'Issue')+' — '+project.repository+' · ข้อมูล Snapshot ไม่ใช่ GitHub Live','note'));
+   if(d.enumeration!=='SAVED_ENUMERATION_COMPLETE'){
+    host.append(element('p','หลักฐานหมายเลขไม่ครบ จึงไม่สร้างรายการขึ้นเอง','note'));return;
+   }
+   host.append(element('p','รายการที่ '+(d.total?d.page*d.pageSize+1:0)+'–'+
+    Math.min(d.total,(d.page+1)*d.pageSize)+' จาก '+d.total+' รายการ · ความสำคัญยังไม่ประเมิน','note'));
+   for(const item of d.items){
+    const entry=element('div','','candidate-entry');
+    entry.append(element('p',(kind==='PR'?'PR #':'Issue #')+item.number+
+     (item.draft===true?' · Draft':'')+' · ยังไม่ใช่ TODO'));
+    const choose=element('button','เลือกตรวจรายการนี้');choose.type='button';
+    choose.addEventListener('click',()=>renderReviewWorksheet(project,projectIndex,{
+     number:item.number,kind:kind==='PR'?'REVIEW_OPEN_PR_AT_SNAPSHOT':'REVIEW_OPEN_ISSUE_AT_SNAPSHOT'
+    }));
+    entry.append(choose);host.append(entry);
+   }
+   const nav=element('div','','row');
+   const prev=element('button','ก่อนหน้า');prev.type='button';prev.disabled=d.page===0;
+   prev.addEventListener('click',()=>show(d.page-1));
+   const next=element('button','หน้าถัดไป');next.type='button';next.disabled=d.page+1>=d.pages;
+   next.addEventListener('click',()=>show(d.page+1));
+   nav.append(prev,next);host.append(nav);
+  }catch{
+   if(host.isConnected&&!panel.hidden&&request===version)
+    host.replaceChildren(element('p','เปิดรายการไม่ได้ — ตรวจสิทธิ์และความครบถ้วนของหลักฐาน','note'));
+  }
+ }
+ return {host,show};
+}
 function renderCandidateDetails(d){
  if(!d||d.mode!=='PRIVATE_REVIEW_CANDIDATES_DETAILS'||!Array.isArray(d.projects))
   throw Error('Invalid review candidate details');
@@ -199,9 +243,23 @@ function renderCandidateDetails(d){
    choose.addEventListener('click',()=>renderReviewWorksheet(project,projectIndex,p));
    entry.append(choose);details.append(entry);
   }
-  if(project.omittedPRs>0||project.omittedIssues>0)
-   details.append(element('p','ยังมีหมายเลขที่ไม่ได้แสดง: PR '+(project.omittedPRs??'?')+
-    ' / Issue '+(project.omittedIssues??'?')+' — ต้องเปิดตรวจจาก Snapshot/GitHub','note'));
+  if(project.omittedPRs>0||project.omittedIssues>0){
+   details.append(element('p','ยังมีหมายเลขที่ไม่ได้แสดงในรายการย่อ: PR '+(project.omittedPRs??'?')+
+    ' / Issue '+(project.omittedIssues??'?')+' — เปิดดูจาก Snapshot ทีละหน้าได้','note'));
+   for(const kind of ['PR','ISSUE']){
+    const remaining=kind==='PR'?project.omittedPRs:project.omittedIssues;
+    if(!(remaining>0))continue;
+    const button=element('button','ดู'+(kind==='PR'?' PR':' Issue')+' ทั้งหมดจาก Snapshot');button.type='button';
+    let view=null;
+    button.addEventListener('click',()=>{
+     if(view){view.host.remove();view=null;button.textContent='ดู'+(kind==='PR'?' PR':' Issue')+' ทั้งหมดจาก Snapshot';return;}
+     view=openCandidatePage(project,projectIndex,kind);
+     button.insertAdjacentElement('afterend',view.host);button.textContent='ปิดรายการ'+(kind==='PR'?' PR':' Issue');
+     view.show(0);
+    });
+    details.append(button);
+   }
+  }
   details.append(element('p','ขั้นต่อไป: ตรวจ PR/Issue ตามหมายเลขบน GitHub แล้วบันทึก TODO ผ่านคำสั่งเจ้าของและยืนยัน CONFIRM เฉพาะรายการที่เลือก','note'));
   box.append(details);root.append(box);
  }
@@ -330,6 +388,18 @@ export async function startOwnerLocalServer({projection,workplan=null,now=()=>Da
    if(!ownerPlan)return deny(res,404);
    const record=buildPrivateReviewCandidates(data,ownerPlan);
    return respond(res,200,JSON.stringify(summarizePrivateReviewCandidates(record)));
+  }
+  if(method==='GET'&&path.startsWith('/api/candidates/page/')){
+   if(!active(req))return deny(res,401);
+   if(!ownerPlan)return deny(res,404);
+   if(!session.details)return deny(res,403);
+   const parts=path.split('/');
+   if(parts.length!==7||!(/^(?:0|[1-9][0-9]?)$/.test(parts[4]))||
+      !['PR','ISSUE'].includes(parts[5])||!(/^(?:0|[1-9][0-9]?)$/.test(parts[6])))
+      return deny(res,404);
+   const index=Number(parts[4]),kind=parts[5],page=Number(parts[6]);
+   try{return respond(res,200,JSON.stringify(buildPrivateCandidatePage(data,ownerPlan,{projectIndex:index,kind,page})));}
+   catch{return deny(res,404);}
   }
   if(method==='GET'&&path==='/api/candidates/details'){
    if(!active(req))return deny(res,401);
