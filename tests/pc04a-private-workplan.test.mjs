@@ -109,7 +109,7 @@ test('PC04A AES-GCM encrypted workplan round-trips and rejects wrong key or tamp
  assert.deepEqual(decryptWorkplan(e,pass),plan);
  assert.doesNotMatch(JSON.stringify(e),/alpha-test|beta-test|fictional-owner/);
  assert.throws(()=>decryptWorkplan(e,'wrong-fake-passphrase'),/./);
- const x={...e,tag:'A'+e.tag.slice(1)};
+ const x={...e,tag:(e.tag[0]==='A'?'B':'A')+e.tag.slice(1)};
  assert.throws(()=>decryptWorkplan(x,pass),/./);
 });
 test('PC04A create-only private workplan file cannot overwrite existing evidence',()=>{
@@ -140,4 +140,16 @@ test('PC04A public Pages and owner-local server do not import private workplan m
  const local=readSource(fileURLToPath(new URL('../tools/private-ui/private-local.mjs',import.meta.url)),'utf8');
  assert.doesNotMatch(source,/workplan-model|encrypted-workplan|owner-workplan\.enc\.json/);
  assert.doesNotMatch(local,/workplan-model|encrypted-workplan|owner-workplan\.enc\.json/);
+});
+
+test('PC04A CLI preflight reports only existence, never private project names',async()=>{
+ const {runPrivateWorkplanCLI}=await import('../tools/private-plan/workplan-cli.mjs');
+ const dir=mkdtempSync(join(tmpdir(),'pc04a-check-'));
+ try{
+  const r=await runPrivateWorkplanCLI(['--check'],{BWD_COMPASS_PRIVATE_DIR:dir});
+  assert.equal(r.mode,'CHECK');
+  assert.equal(r.workplanExists,false);
+  assert.equal(r.writes,false);
+  assert.doesNotMatch(JSON.stringify(r),/fictional-owner|alpha-test|beta-test/);
+ }finally{rmSync(dir,{force:true,recursive:true});}
 });
