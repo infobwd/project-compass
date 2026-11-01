@@ -30,8 +30,10 @@ export function buildPrivateReviewCandidates(projection,workplan,{perType=2}={})
  for(let i=0;i<projection.projects.length;i++){
   const p=projection.projects[i],owned=workplan.projects[i];
   ok(p.id===owned.repository,'selected scope mismatch');
-  const prs=knownCollection(p.github?.openPRs,p.github?.openPRs,p.github?.prReferences,{kind:'PR'});
-  const issues=knownCollection(p.github?.openIssues,p.github?.openIssues,p.github?.issueNumbers,{kind:'ISSUE'});
+  const prs=knownCollection(p.github?.openPRs===null?'UNKNOWN':'VERIFIED',
+    p.github?.openPRs,p.github?.prReferences,{kind:'PR'});
+  const issues=knownCollection(p.github?.openIssues===null?'UNKNOWN':'VERIFIED',
+    p.github?.openIssues,p.github?.issueNumbers,{kind:'ISSUE'});
   const results=[{kind:'PR',value:prs},{kind:'ISSUE',value:issues}];
   for(const {kind,value} of results){
    if(!value.complete){incomplete++;continue;}
