@@ -128,3 +128,7 @@ The axes are Development / Git / Deployment / Decision / Confidence. All source 
 
 ### PC-03D3B-0 — offline evidence adapter and blocked real-data browser gate
 D3A's five-axis fictional UI passed Local Acceptance by owner report. The next Draft branch adds [a strict **offline-only** evidence projection and security runbook](docs/PC03D3B0_OFFLINE_EVIDENCE_SECURITY_RUNBOOK.md), without opening real private data in any HTTP view. `tools/private-ui/offline-projection.mjs` uses the validated GitHub snapshot contract strictly in memory; `node tools/private-ui/security-preflight.mjs --check` examines source isolation and **always prints** `BLOCKED_FOR_REAL_PRIVATE_DATA` until separate owner security approval and evidence gates are satisfied. The D2/D0 exceptions remain open. **No Merge / Deploy / Production change**.
+
+
+### PC-03D3B-1 — fictional-only hostile-origin security checks (Draft)
+Following owner-observed PC-03D3B-0 **74/74 tests**, Build, Dist Scan and 5/5 source preflight PASS, the next branch adds six [synthetic-only adversarial security tests and an explicit D0/D3B gate register](docs/PC03D3B1_SYNTHETIC_SECURITY_GATES.md). The real private browser remains **BLOCKED**. No private Snapshot access, code merge, deploy, production changes or automatic historical Git rewrite is authorized.
