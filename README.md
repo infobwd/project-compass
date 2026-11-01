@@ -165,3 +165,13 @@ The owner confirmed PC-04A `--check → --init → --summary` succeeded for an *
 - `tools/private-plan/workplan-revision.mjs`: AES-GCM/scrypt encrypted backup before replacement, exclusive lock and SHA-256 stale file check, no silent overwrite. Real Windows file-system QA is required before acceptance.
 - Six fictional-only regression tests. No automatic `DONE`, development acceptance, host verification, GitHub write or public Pages data.
 - Local/private release only, on a stacked Draft PR separate from public `main`. No Merge or Deploy.
+
+
+### PC-04C — Owner-private read-only workplan overlay (DRAFT)
+After PC-04B dummy `--input-check` was reported PASS by the owner, this phase connects the **existing encrypted owner workplan** to the separately authorized local 127.0.0.1 viewer. The *old* `--ack-real-private-local` flag still reads Snapshot only. The *new* explicit `--ack-private-workplan-local` flag reads both the validated Snapshot and workplan from the owner's outside-Git private folder after a Terminal passphrase. No automatic edits.
+
+- After pairing: only nonidentifying counts of owner-recorded open/overdue actions, pending decisions and owner reviews.
+- After second detail authorization: minimized list of explicitly owner-recorded TODOs and other statuses, no local worktree/host links/raw evidence refs or encrypted file contents. Empty registry means **no task recorded**, not no real work pending.
+- Eight fictional-only regression tests for unauthenticated 401, detail 403, logout 401, scope mismatch, hostile origin and no public React import.
+- Full guide: [PC-04C owner-private Dashboard acceptance](docs/PC04C_PRIVATE_WORKPLAN_DASHBOARD_RUNBOOK.md).
+- **Draft only; Windows exact-HEAD QA and any actual private TODO save remain separately unverified. No Merge, Deploy or private Pages content.**
