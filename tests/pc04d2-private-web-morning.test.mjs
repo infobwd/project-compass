@@ -149,3 +149,33 @@ test('PC04D2 browser UI displays Thai text via UTF-8 DOM and scrubs on logout, n
  const pub=readFileSync(fileURLToPath(new URL('../src/App.tsx',import.meta.url)),'utf8');
  assert.doesNotMatch(pub,/morning-brief|api\/morning|private-local|owner-workplan/);
 });
+
+
+test('PC04D2 owner Morning Brief uses one task list, without duplicating workplan tasks',async()=>{
+ await withServer(async({hit})=>{
+  const app=(await hit('/app.js')).text;
+  assert.match(app,/if\(!el\('morning'\)\.hidden\)renderMorningDetails\(await api\('\/api\/morning\/details'\)\)/);
+  assert.match(app,/else if\(!el\('workplan'\)\.hidden\)renderOwnerActions\(await api\('\/api\/workplan\/actions'\)\)/);
+  assert.match(app,/if\(b\.actions\.length>0\)parent\.append\(element\('h3','งานถัดไปที่เจ้าของบันทึกจริง'\)\)/);
+  assert.match(app,/ยังไม่มี TODO ที่เจ้าของบันทึก/);
+  assert.doesNotMatch(app,/innerHTML|document\.write\(|localStorage/);
+  const fallback=(await hit('/api/morning/details')).status;
+  assert.equal(fallback,401);
+ });
+});
+test('PC04D2 review prompts are collapsed accessible disclosure controls with safe textContent',async()=>{
+ await withServer(async({hit})=>{
+  const app=(await hit('/app.js')).text;
+  const css=(await hit('/style.css')).text;
+  assert.match(app,/element\('details','','review-item'\)/);
+  assert.match(app,/element\('summary','','review-heading'\)/);
+  assert.match(app,/element\('li',labels\[code\]\?\?'หลักฐานยังไม่ครบ'\)/);
+  assert.match(app,/element\('span',entry\.missing\.length\+' ประเด็น'\)/);
+  assert.match(css,/\.review-heading:focus-visible/);
+  assert.match(css,/\.review-heading\{[^}]*min-height:48px/);
+  assert.match(css,/@media\(max-width:600px\)/);
+  assert.doesNotMatch(app,/\.innerHTML|onmouseover|onclick=|eval\(/);
+  const staticPage=(await hit('/')).text;
+  assert.doesNotMatch(staticPage,/fictional-owner|TOP-SECRET-NEVER-EXPOSE|private\.invalid/);
+ });
+});
