@@ -75,7 +75,7 @@ Use a private-only worksheet to record: reviewed machine, tested exact HEAD, obs
 ## Release restriction / rollback
 
 - No automatic Merge, Deploy, encrypted Workplan write, live Stage refresh, repository migration, remote secret export, Git history rewrite or browser launch.
-- This PC-04M PR is **docs-only** and stacked on PC-04L; neither its Draft status nor its authoring means the five human gates are resolved.
+- This PC-04M PR is **docs-only** and stacked on PC-04L; M1 owner residual risk acceptance is **not** technical security verification, and M2–M5 remain unresolved.
 - Stop any owner-local private session when finished and close with Ctrl+C. If a real disclosure is suspected, suspend release, preserve evidence privately and decide remediation separately before continuing.
 
-**Decision today:** PC-04L owner-local automated acceptance PASS; PC-04M human security gates M1–M5 remain OPEN. Next owner action is *private historic-public-source review with an explicit risk decision*, not a command that changes repository or Host state.
+**Current owner decision:** PC-04L owner-local automated acceptance PASS; PC-04M M1 historic-public-source risk is **ACCEPTED BY OWNER, NOT REMEDIATED**. M2–M5 remain OPEN. Next owner action is **M2 synthetic-only Logout/Refresh/HTTP 401 inspection**. Real-private browser use still requires a separate explicit authorization under M3.
