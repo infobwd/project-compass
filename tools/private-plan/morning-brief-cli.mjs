@@ -8,10 +8,11 @@ import {loadPrivateProjection} from '../private-ui/private-local.mjs';
 import {readPrivateWorkplanFile} from './encrypted-workplan.mjs';
 import {readTerminalLine} from './action-entry.mjs';
 import {buildPrivateMorningBrief,summarizePrivateBrief} from './morning-brief.mjs';
+import {formatPrivateCompactBrief} from './morning-brief-compact.mjs';
 
 export async function runLocalMorningBrief(args=process.argv.slice(2),env=process.env){
- if(args.length===1&&args[0]==='--help')return {usage:'--summary | --details',network:false,writes:false};
- if(args.length!==1||!['--summary','--details'].includes(args[0]))
+ if(args.length===1&&args[0]==='--help')return {usage:'--summary | --compact | --details',network:false,writes:false};
+ if(args.length!==1||!['--summary','--compact','--details'].includes(args[0]))
   throw Error('PC04D_INVALID_MODE');
  if(!env.BWD_COMPASS_PRIVATE_DIR||!process.stdin.isTTY)
   throw Error('PC04D_PRIVATE_TTY_AND_FOLDER_REQUIRED');
@@ -27,6 +28,10 @@ export async function runLocalMorningBrief(args=process.argv.slice(2),env=proces
  process.stdout.write('Do not screen-share, redirect output to public files or paste into public GitHub.\n');
  const confirmation=await readTerminalLine('Type DISPLAY to view PRIVATE local details (anything else cancels): ',{max:16});
  if(confirmation.trim()!=='DISPLAY')return {mode:'DETAILS_CANCELLED',writes:false,privateDetailsShown:false};
+ if(args[0]==='--compact'){
+  process.stdout.write('\n'+formatPrivateCompactBrief(brief));
+  return {mode:'DETAILS_DISPLAYED',writes:false,privateDetailsShown:true,compact:true};
+ }
  // Details stay on owner's terminal only. No plaintext report file or web endpoint.
  process.stdout.write('\nPRIVATE LOCAL MORNING BRIEF — '+brief.dayBangkok+' (Asia/Bangkok)\n');
  process.stdout.write('Git Snapshot observed '+brief.github.observedAt+
