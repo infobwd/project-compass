@@ -107,5 +107,13 @@ test('PC04B user-facing private entry is terminal-only; no public frontend/HTTP 
  assert.match(entry,/Type CONFIRM to save encrypted revision/);
  assert.match(entry,/status:'TODO'/);
  assert.doesNotMatch(entry,/fetch\(|createServer\(|writeFileSync\(/);
- assert.doesNotMatch(app+server,/action-entry\.mjs|workplan-revision\.mjs|owner-workplan\.enc\.json/);
+ // Public Pages must have no private references; private local text may explain
+ // how to use the separate owner-confirmed terminal CLI without importing it.
+ assert.doesNotMatch(app,/action-entry\.mjs|workplan-revision\.mjs|owner-workplan\.enc\.json/);
+ const serverImportLines=server.split('\n').filter(line=>/^\s*import\s/.test(line));
+ assert.doesNotMatch(serverImportLines.join('\n'),/action-entry\.mjs|workplan-revision\.mjs/);
+ assert.doesNotMatch(server,/\bimport\s*\(\s*['"][^'"]*(?:action-entry|workplan-revision)\.mjs/);
+ assert.doesNotMatch(server,/commitOwnerRevision\s*\(|createOwnerAction\s*\(/);
+ // Only session pairing, step-up, and logout use POST; never edit workplan via HTTP.
+ assert.match(server,/if\(method==='POST'&&\['\/session','\/session\/details','\/session\/logout'\]\.includes\(path\)\)/);
 });
