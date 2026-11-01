@@ -118,3 +118,9 @@ D1 locked synthetic shell remains available and unchanged. D2 introduces a **sep
   `node tools/private-ui/auth-synthetic.mjs`
 - Use the URL and one-time code printed on your own local terminal; do not send codes, cookies or screenshots of the terminal code.
 - Existing D0 historical public path metadata review remains OPEN; keep all PRs Draft and do not merge/deploy.
+
+
+### PC-03D3A — synthetic five-axis evidence UI (Draft, read-only)
+After D2 was administratively closed for synthetic Local Acceptance (with outstanding manual logout/SHA evidence exceptions), D3A introduces a **fictional-only** five-axis evidence view behind the existing one-time local pairing and detail-acknowledgement controls. See [D3A evidence contract and Windows acceptance runbook](docs/PC03D3A_SYNTHETIC_EVIDENCE_WINDOWS_RUNBOOK.md).
+
+The axes are Development / Git / Deployment / Decision / Confidence. All source observations are intentionally null and the entire view is marked `FICTIONAL_FIXTURE`, not live project status. There is no encrypted Snapshot access, local private-file read, GitHub sync, remote access, publishing or production connection. D0 historical public path review and D2 evidence exceptions remain open. Any real-data browser connection needs a separate explicit security decision and human approval. **No Merge / No Deploy.**
